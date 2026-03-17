@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Clean City Initiative</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Font (Roboto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Configure Tailwind (Same as other pages) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': '#28a745', // Main green
+                        'smart-green-light': '#dcfce7', // Lighter green
+                        'smart-blue': '#17a2b8',  // Admin blue
+                        'smart-yellow': '#ffc107', // Driver yellow
+                        'smart-dark': '#333333',   // Footer/text dark
+                        'smart-gray': '#6c757d',   // Subtext gray
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    height: {
+                        '80px': '80px', // Custom height for desktop header
+                    },
+                    minHeight: {
+                        '60px': '60px', // Custom min-height for mobile header
+                    },
+                    boxShadow: {
+                        'header': '0 2px 6px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.1)',
+                        'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles (Nav hover effect) -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .hero-bg-blog {
+            /* Dynamic hero image */
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2)), url('https://placehold.co/1920x800/28a745/FFFFFF?text=Community+Clean-up+Drive');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Custom class for the nav link hover effect */
+        .nav-link {
+            position: relative;
+            text-decoration: none;
+            color: #333333;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            transition: width 0.3s ease-in-out;
+        }
+        .nav-link:hover {
+            color: #28a745;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .nav-link-active {
+            color: #28a745;
+            font-weight: 500;
+        }
+        .nav-link-active::after {
+            width: 100%;
+            background-color: #28a745;
+            height: 2px;
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            content: '';
+        }
+    </style>
+</head>
+<body class="font-roboto text-smart-dark antialiased">
+
+    <!-- Header (Sticky) -->
+    <header class="bg-white shadow-header sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[80px] min-h-[60px]">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center space-x-2">
+                <!-- SVG Logo: Recycle Bin -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                <span class="text-xl font-bold text-smart-green">Clean City</span>
+            </a>
+            
+            <!-- Navigation (Desktop) -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link font-medium">Home</a>
+                <a href="about.html" class="nav-link font-medium">About</a>
+                <a href="awareness.html" class="nav-link font-medium">Awareness</a>
+                <a href="blog.html" class="nav-link nav-link-active">Blog</a>
+                <a href="contact.html" class="nav-link font-medium">Contact</a>
+            </div>
+            
+            <!-- Hamburger Menu (Mobile) -->
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-smart-dark focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu (Collapsible) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <a href="index.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Home</a>
+            <a href="about.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">About</a>
+            <a href="awareness.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Awareness</a>
+            <a href="blog.html" class="block px-6 py-3 text-smart-green font-medium bg-gray-50">Blog</a>
+            <a href="contact.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Dynamic Featured Post Hero Section -->
+        <section class="hero-bg-blog h-[500px] flex items-end text-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+                <div class="max-w-2xl">
+                    <span id="hero-category" class="bg-smart-green text-white text-sm font-semibold px-3 py-1 rounded-full">Community Story</span>
+                    <h1 id="hero-title" class="text-4xl lg:text-5xl font-bold mt-4 mb-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                        Sector 5 Residents Transform Local Park in Weekend Clean-up Drive
+                    </h1>
+                    <p id="hero-description" class="text-lg text-gray-200 mb-6" style="text-shadow: 0 1px 3px rgba(0,0,0,0.4);">
+                        See the incredible before-and-after photos and learn how our platform helped coordinate the effort.
+                    </p>
+                    <a id="hero-link" href="#" class="bg-white text-smart-green font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition-colors duration-300 transform hover:scale-105">
+                        Read Full Story
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Blog Content Area (2-column layout) -->
+        <div class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row gap-12">
+                    
+                    <!-- Main Feed (Left Column) -->
+                    <div class="w-full lg:w-2/3">
+                        <h2 class="text-3xl font-bold text-smart-dark mb-8">Latest Posts</h2>
+                        
+                        <div id="blog-container" class="space-y-10">
+                            <!-- Blog Post Card 1: News -->
+                            <article class="bg-white rounded-2xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover">
+                                <a href="#">
+                                    <img src="https://placehold.co/800x450/17a2b8/FFFFFF?text=New+Recycling+Policy" alt="Recycling bins" class="w-full h-64 object-cover">
+                                </a>
+                                <div class="p-6">
+                                    <span class="text-smart-blue text-sm font-semibold">News & Updates</span>
+                                    <h3 class="text-2xl font-semibold text-smart-dark my-2 hover:text-smart-green transition-colors"><a href="#">City Announces New Policy Banning Single-Use Plastics</a></h3>
+                                    <p class="text-smart-gray mb-4">Starting next month, new regulations will phase out plastic bags, straws, and cutlery in all local businesses. Learn what this means for you...</p>
+                                    <div class="text-sm text-smart-gray">By <span class="font-medium text-smart-dark">Municipal Office</span> | Oct 26, 2025</div>
+                                </div>
+                            </article>
+                            
+                            <!-- Blog Post Card 2: How-To Guide -->
+                            <article class="bg-white rounded-2xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover">
+                                <a href="#">
+                                    <img src="https://placehold.co/800x450/28a745/FFFFFF?text=Home+Composting+101" alt="Compost bin" class="w-full h-64 object-cover">
+                                </a>
+                                <div class="p-6">
+                                    <span class="text-smart-green text-sm font-semibold">Tips & How-To</span>
+                                    <h3 class="text-2xl font-semibold text-smart-dark my-2 hover:text-smart-green transition-colors"><a href="#">A Beginner's Guide to Composting at Home</a></h3>
+                                    <p class="text-smart-gray mb-4">Turn your kitchen scraps into nutrient-rich soil for your plants. Our step-by-step guide makes it easy to start, even in a small apartment...</p>
+                                    <div class="text-sm text-smart-gray">By <span class="font-medium text-smart-dark">Ananya S. (Guest Post)</span> | Oct 24, 2025</div>
+                                </div>
+                            </article>
+                            
+                             <!-- Blog Post Card 3: Infographic -->
+                            <article class="bg-white rounded-2xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover">
+                                <a href="#">
+                                    <img src="https://placehold.co/800x450/ffc107/FFFFFF?text=Infographic:+Which+Bin+Does+It+Go+In?" alt="Infographic" class="w-full h-64 object-cover">
+                                </a>
+                                <div class="p-6">
+                                    <span class="text-smart-yellow text-sm font-semibold">Visual Guide</span>
+                                    <h3 class="text-2xl font-semibold text-smart-dark my-2 hover:text-smart-green transition-colors"><a href="#">Infographic: What Really Goes in Each Bin?</a></h3>
+                                    <p class="text-smart-gray mb-4">Confused about pizza boxes or plastic wrap? This simple visual guide breaks down what goes into your green, blue, and yellow bags...</p>
+                                    <div class="text-sm text-smart-gray">By <span class="font-medium text-smart-dark">Clean City Team</span> | Oct 22, 2025</div>
+                                </div>
+                            </article>
+                            
+                            <!-- Blog Post Card 4: Case Study -->
+                            <article class="bg-white rounded-2xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover">
+                                <a href="#">
+                                    <img src="https://placehold.co/800x450/6c757d/FFFFFF?text=Case+Study:+Successful+Systems" alt="Clean city" class="w-full h-64 object-cover">
+                                </a>
+                                <div class="p-6">
+                                    <span class="text-smart-gray text-sm font-semibold">Case Studies</span>
+                                    <h3 class="text-2xl font-semibold text-smart-dark my-2 hover:text-smart-green transition-colors"><a href="#">How Other Cities Are Winning the War on Waste</a></h3>
+                                    <p class="text-smart-gray mb-4">We look at three cities around the world that have implemented successful waste management systems and what we can learn from them...</p>
+                                    <div class="text-sm text-smart-gray">By <span class="font-medium text-smart-dark">Rohan Kumar</span> | Oct 20, 2025</div>
+                                </div>
+                            </article>
+                            
+                            <!-- Pagination (Mockup) -->
+                            <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+                                <a href="#" class="inline-flex items-center gap-2 text-smart-gray hover:text-smart-dark transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                    <span>Older Posts</span>
+                                </a>
+                                <span class="text-smart-gray text-sm">Page 1 of 5</span>
+                                <a href="#" class="inline-flex items-center gap-2 text-smart-gray hover:text-smart-dark transition-colors">
+                                    <span>Newer Posts</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar (Right Column) -->
+                    <aside class="w-full lg:w-1/3 space-y-8 lg:mt-16">
+                        
+                        <!-- Categories Widget -->
+                        <div class="bg-white p-6 rounded-2xl shadow-card">
+                            <h3 class="text-xl font-semibold text-smart-dark mb-4 border-b pb-3">Categories</h3>
+                            <ul class="space-y-3">
+                                <li class="flex justify-between items-center">
+<span>News & Updates</span>
+<span id="cat-news" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0</span>
+</li>
+
+<li class="flex justify-between items-center">
+<span>Tips & How-To</span>
+<span id="cat-tips" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0</span>
+</li>
+
+<li class="flex justify-between items-center">
+<span>Community Stories</span>
+<span id="cat-community" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0</span>
+</li>
+
+<li class="flex justify-between items-center">
+<span>Case Studies</span>
+<span id="cat-case" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0</span>
+</li>
+
+<li class="flex justify-between items-center">
+<span>Guest Posts</span>
+<span id="cat-guest" class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">0</span>
+</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Interactive Poll Widget -->
+                        <div class="bg-white p-6 rounded-2xl shadow-card">
+                            <h3 class="text-xl font-semibold text-smart-dark mb-4 border-b pb-3">Quick Poll</h3>
+                            <p class="text-smart-gray mb-4">What's your biggest challenge with recycling?</p>
+                            <div class="space-y-3">
+                                <button class="poll-option w-full text-left text-sm text-smart-dark bg-gray-50 p-3 rounded-lg hover:bg-gray-100 border border-gray-200">A) Knowing what to recycle</button>
+                                <button class="poll-option w-full text-left text-sm text-smart-dark bg-gray-50 p-3 rounded-lg hover:bg-gray-100 border border-gray-200">B) Finding time to sort</button>
+                                <button class="poll-option w-full text-left text-sm text-smart-dark bg-gray-50 p-3 rounded-lg hover:bg-gray-100 border border-gray-200">C) Lack of collection points</button>
+                                <button class="poll-option w-full text-left text-sm text-smart-dark bg-gray-50 p-3 rounded-lg hover:bg-gray-100 border border-gray-200">D) Other</button>
+                            </div>
+                        </div>
+                        
+                        <!-- "Did You Know?" Widget -->
+                        <div class="bg-smart-green-light p-6 rounded-2xl shadow-card border-l-4 border-smart-green">
+                            <div class="flex items-center gap-3 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green flex-shrink-0"><path d="M12 2.69l.34 2.16-1.9 1.9a1.5 1.5 0 0 0 .1 2.2l1.9 1.9-.34 2.16 2.16-.34 1.9 1.9a1.5 1.5 0 0 0 2.2.1l1.9-1.9 2.16.34-.34-2.16 1.9-1.9a1.5 1.5 0 0 0-.1-2.2l-1.9-1.9-2.16-.34z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                                <h3 class="text-xl font-semibold text-smart-dark">Did You Know?</h3>
+                            </div>
+                            <p class="text-smart-gray text-sm">Recycling one aluminum can saves enough energy to run a TV for three hours. Our city recycled over 50,000 cans last month!</p>
+                        </div>
+                        
+                        <!-- Upcoming Events Widget -->
+                        <div class="bg-white p-6 rounded-2xl shadow-card">
+                            <h3 class="text-xl font-semibold text-smart-dark mb-4 border-b pb-3">Upcoming Events</h3>
+                            <ul class="space-y-4">
+                                <li class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-smart-blue text-white rounded-lg flex flex-col items-center justify-center leading-none">
+                                        <span class="font-bold text-lg">05</span>
+                                        <span class="text-xs">NOV</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-smart-dark hover:text-smart-blue"><a href="#">E-Waste Collection Drive</a></h4>
+                                        <p class="text-sm text-smart-gray">Central Park, 10 AM - 4 PM</p>
+                                    </div>
+                                </li>
+                                 <li class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-smart-blue text-white rounded-lg flex flex-col items-center justify-center leading-none">
+                                        <span class="font-bold text-lg">12</span>
+                                        <span class="text-xs">NOV</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-smart-dark hover:text-smart-blue"><a href="#">Composting Workshop</a></h4>
+                                        <p class="text-sm text-smart-gray">Online Webinar, 7 PM</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </aside>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call to Action Section -->
+        <section class="bg-smart-blue text-white">
+            <div class="container mx-auto px-4 py-16 text-center">
+                <h2 class="text-3xl font-bold mb-4">Have a Story to Share?</h2>
+                <p class="text-lg text-blue-100 mb-8 max-w-xl mx-auto">Are you a local hero, an expert, or part of a community clean-up? We'd love to feature your story.</p>
+                <a href="contact.html" class="bg-white text-smart-blue font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition-colors duration-300 transform hover:scale-105">
+                    Get in Touch
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact-footer" class="bg-smart-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
+                <!-- Left Column: Logo + Tagline -->
+                <div>
+                    <a href="index.html" class="flex items-center justify-center md:justify-start space-x-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                           <path d="M3 6h18"></path>
+                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <span class="text-xl font-bold text-white">Clean City</span>
+                    </a>
+                    <p class="text-sm text-gray-400">A cleaner, smarter future for our city.</p>
+                </div>
+                
+                <!-- Center Column: Quick Links -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-smart-green transition-colors">Home</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-smart-green transition-colors">About Us</a></li>
+                        <li><a href="awareness.html" class="text-gray-300 hover:text-smart-green transition-colors">Awareness</a></li>
+                         <li><a href="blog.html" class="text-gray-300 hover:text-smart-green transition-colors">Blog</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-smart-green transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Right Column: Social Media -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Follow Us</h4>
+                    <div class="flex justify-center md:justify-start space-x-5">
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Twitter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-700 mt-10 pt-6 text-center text-sm text-gray-500">
+                <p>&copy; 2025 Clean City Initiative. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+async function loadBlogs(){
+
+    try{
+
+        const res = await fetch("https://novomesh-backend.onrender.com/api/blogs");
+        const blogs = await res.json();
+        console.log("Blogs loaded:", blogs);
+
+        const container = document.querySelector(".space-y-10");
+container.innerHTML = "";
+
+// category counters
+let news = 0;
+let tips = 0;
+let community = 0;
+let caseStudy = 0;
+let guest = 0;
+
+blogs.forEach(blog => {
+    let badgeColor = "text-smart-green";
+
+if(blog.category === "News & Updates") badgeColor = "text-smart-blue";
+if(blog.category === "Tips & How-To") badgeColor = "text-smart-green";
+if(blog.category === "Community Stories") badgeColor = "text-smart-yellow";
+
+    // count categories
+    if(blog.category === "News & Updates") news++;
+    if(blog.category === "Tips & How-To") tips++;
+    let eventAlert = 0;
+
+if(blog.category === "Event Alert") eventAlert++;
+    if(blog.category === "Case Studies") caseStudy++;
+    if(blog.category === "Guest Posts") guest++;
+    if(blog.category === "Community Stories") community++;
+
+    const article = document.createElement("article");
+
+    article.className = "bg-white rounded-2xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover";
+
+    article.innerHTML = `
+<div class="p-6">
+
+<span class="text-smart-green text-sm font-semibold">${blog.category}</span>
+
+<h3 class="text-2xl font-semibold text-smart-dark my-2">
+${blog.title}
+</h3>
+
+<p class="text-smart-gray mb-4">
+${blog.content.length > 120 
+    ? blog.content.substring(0,120) + "..." 
+    : blog.content}
+</p>
+
+${
+blog.external_link 
+? `<a href="${blog.external_link}" target="_blank" class="text-smart-blue font-semibold hover:underline">
+Open Link →
+</a>`
+: ""
+}
+
+<div class="text-sm text-smart-gray mt-3">
+${new Date(blog.created_at).toDateString()}
+</div>
+
+</div>
+`;
+
+    container.appendChild(article);
+
+});
+        document.getElementById("cat-news").textContent = news;
+document.getElementById("cat-tips").textContent = tips;
+document.getElementById("cat-community").textContent = community;
+document.getElementById("cat-case").textContent = caseStudy;
+document.getElementById("cat-guest").textContent = guest;
+
+    }catch(err){
+
+        console.error("Failed to load blogs", err);
+
+    }
+
+}
+
+loadBlogs();
+
+</script>
+
+    <script>
+        loadBlogs = async function () {
+            try {
+                const res = await fetch("https://novomesh-backend.onrender.com/api/blogs");
+                const blogs = await res.json();
+                const container = document.getElementById("blog-container");
+                const heroSection = document.querySelector(".hero-bg-blog");
+                const heroCategory = document.getElementById("hero-category");
+                const heroTitle = document.getElementById("hero-title");
+                const heroDescription = document.getElementById("hero-description");
+                const heroLink = document.getElementById("hero-link");
+
+                container.innerHTML = "";
+
+                let news = 0;
+                let tips = 0;
+                let community = 0;
+                let caseStudy = 0;
+                let guest = 0;
+
+                const featuredCommunityPost = blogs.find(blog => blog.category === "Community Stories");
+
+                if (featuredCommunityPost) {
+                    heroCategory.textContent = featuredCommunityPost.category;
+                    heroTitle.textContent = featuredCommunityPost.title;
+                    heroDescription.textContent = featuredCommunityPost.content
+                        ? (featuredCommunityPost.content.length > 180
+                            ? featuredCommunityPost.content.substring(0, 180) + "..."
+                            : featuredCommunityPost.content)
+                        : "See the latest community success story from Clean City.";
+                    heroLink.href = featuredCommunityPost.external_link || "#blog-container";
+                    heroLink.textContent = featuredCommunityPost.external_link ? "Open Story" : "View Latest Story";
+
+                    if (featuredCommunityPost.image_url) {
+                        heroSection.style.backgroundImage =
+                            `linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2)), url('${featuredCommunityPost.image_url}')`;
+                    }
+                }
+
+                blogs.forEach(blog => {
+                    let badgeColor = "text-smart-green";
+
+                    if (blog.category === "News & Updates") badgeColor = "text-smart-blue";
+                    if (blog.category === "Tips & How-To") badgeColor = "text-smart-green";
+                    if (blog.category === "Community Stories") badgeColor = "text-smart-yellow";
+                    if (blog.category === "Case Studies") badgeColor = "text-smart-gray";
+
+                    if (blog.category === "News & Updates") news++;
+                    if (blog.category === "Tips & How-To") tips++;
+                    if (blog.category === "Community Stories") community++;
+                    if (blog.category === "Case Studies") caseStudy++;
+                    if (blog.category === "Guest Posts") guest++;
+
+                    const previewText = blog.content
+                        ? (blog.content.length > 120 ? blog.content.substring(0, 120) + "..." : blog.content)
+                        : "Click below to open this update.";
+
+                    const article = document.createElement("article");
+                    article.className = "bg-white rounded-2xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover";
+
+                    article.innerHTML = `
+                        ${blog.image_url ? `
+                            <a href="${blog.external_link || "#"}" ${blog.external_link ? 'target="_blank" rel="noopener noreferrer"' : ""}>
+                                <img src="${blog.image_url}" alt="${blog.title}" class="w-full h-64 object-cover">
+                            </a>
+                        ` : ""}
+                        <div class="p-6">
+                            <span class="${badgeColor} text-sm font-semibold">${blog.category}</span>
+                            <h3 class="text-2xl font-semibold text-smart-dark my-2">${blog.title}</h3>
+                            <p class="text-smart-gray mb-4">${previewText}</p>
+                            ${blog.external_link ? `
+                                <a href="${blog.external_link}" target="_blank" rel="noopener noreferrer" class="text-smart-blue font-semibold hover:underline">
+                                    Open Link ->
+                                </a>
+                            ` : ""}
+                            <div class="text-sm text-smart-gray mt-3">
+                                ${new Date(blog.created_at).toDateString()}
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(article);
+                });
+
+                document.getElementById("cat-news").textContent = news;
+                document.getElementById("cat-tips").textContent = tips;
+                document.getElementById("cat-community").textContent = community;
+                document.getElementById("cat-case").textContent = caseStudy;
+                document.getElementById("cat-guest").textContent = guest;
+            } catch (err) {
+                console.error("Failed to load blogs", err);
+            }
+        };
+
+        loadBlogs();
+    </script>
+
+    <!-- JavaScript for Micro-interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Poll functionality (simple visual feedback)
+            const pollOptions = document.querySelectorAll('.poll-option');
+            pollOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove selected state from all options
+                    pollOptions.forEach(opt => {
+                        opt.classList.remove('bg-smart-green');
+                        opt.classList.remove('text-white');
+                        opt.classList.add('bg-gray-50');
+                        opt.classList.add('text-smart-dark');
+                    });
+                    // Add selected state to the clicked option
+                    option.classList.add('bg-smart-green');
+                    option.classList.add('text-white');
+                    option.classList.remove('bg-gray-50');
+                    option.classList.remove('text-smart-dark');
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>

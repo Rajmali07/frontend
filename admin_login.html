@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal Login - Clean City</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Font (Roboto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Configure Tailwind (Same as other pages) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': '#28a745', // Main green
+                        'smart-green-light': '#dcfce7', // Lighter green
+                        'smart-blue': '#17a2b8',  // Admin blue
+                        'smart-blue-light': '#e0f7fa', // Lighter blue
+                        'smart-yellow': '#ffc107', // Driver yellow
+                        'smart-yellow-light': '#fffbeb', // Lighter yellow
+                        'smart-dark': '#333333',   // Footer/text dark
+                        'smart-gray': '#6c757d',   // Subtext gray
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    height: {
+                        '80px': '80px', // Custom height for desktop header
+                    },
+                    minHeight: {
+                        '60px': '60px', // Custom min-height for mobile header
+                    },
+                    boxShadow: {
+                        'header': '0 2px 6px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.1)',
+                        'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles (Nav hover effect) -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        /* Custom class for the nav link hover effect */
+        .nav-link {
+            position: relative;
+            text-decoration: none;
+            color: #333333;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            transition: width 0.3s ease-in-out;
+        }
+        .nav-link:hover {
+            color: #28a745;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Specific style for login page main content */
+        .main-content {
+            min-height: calc(100vh - 160px); /* Approx header + footer height */
+        }
+    </style>
+</head>
+<body class="font-roboto text-smart-dark antialiased">
+
+    <!-- Header (Sticky) -->
+    <header class="bg-white shadow-header sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[80px] min-h-[60px]">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center space-x-2">
+                <!-- SVG Logo: Recycle Bin -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                <span class="text-xl font-bold text-smart-green">Clean City</span>
+            </a>
+            
+            <!-- Navigation (Desktop) -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link font-medium">Home</a>
+                <a href="about.html" class="nav-link font-medium">About</a>
+                <a href="awareness.html" class="nav-link font-medium">Awareness</a>
+                <a href="blog.html" class="nav-link font-medium">Blog</a>
+                <a href="contact.html" class="nav-link font-medium">Contact</a>
+            </div>
+            
+            <!-- Hamburger Menu (Mobile) -->
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-smart-dark focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu (Collapsible) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <a href="index.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Home</a>
+            <a href="about.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">About</a>
+            <a href="awareness.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Awareness</a>
+            <a href="blog.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Blog</a>
+            <a href="contact.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Contact</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content bg-gray-50 flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full">
+            
+            <!-- Login Card -->
+            <div class="bg-white p-8 rounded-2xl shadow-card border-t-4 border-smart-blue">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-smart-dark">Admin Portal Login</h2>
+                    <p class="text-smart-gray mt-2">Sign in to manage operations and view city analytics.</p>
+                </div>
+                
+                <form id="login-form" class="space-y-6">
+                    <!-- Email / Admin ID -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-smart-gray mb-1">Email or Admin ID</label>
+                        <input type="text" id="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-smart-blue focus:border-transparent" placeholder="admin@example.com or A-123" value="admin@example.com">
+                    </div>
+                    
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-smart-gray mb-1">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-smart-blue focus:border-transparent" placeholder="••••••••" value="admin123">
+                            <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-smart-gray hover:text-smart-dark transition-colors">
+                                <!-- Eye Icon -->
+                                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                <!-- Eye Off Icon -->
+                                <svg id="eye-off-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-smart-blue border-gray-300 rounded focus:ring-smart-blue">
+                            <label for="remember-me" class="ml-2 block text-smart-gray">Remember me</label>
+                        </div>
+                        
+                        <a href="#" id="forgot-password-link" class="font-medium text-smart-blue hover:text-blue-700">
+                            Forgot password?
+                        </a>
+                    </div>
+                    
+                    <!-- Form Status Message -->
+                    <div id="form-status" class="text-center"></div>
+
+                    <!-- Login Button -->
+                    <div>
+                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-white font-bold bg-smart-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-smart-blue transition-all duration-300 transform hover:scale-105">
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact-footer" class="bg-smart-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
+                <!-- Left Column: Logo + Tagline -->
+                <div>
+                    <a href="index.html" class="flex items-center justify-center md:justify-start space-x-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                           <path d="M3 6h18"></path>
+                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <span class="text-xl font-bold text-white">Clean City</span>
+                    </a>
+                    <p class="text-sm text-gray-400">A cleaner, smarter future for our city.</p>
+                </div>
+                
+                <!-- Center Column: Quick Links -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-smart-green transition-colors">Home</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-smart-green transition-colors">About Us</a></li>
+                        <li><a href="awareness.html" class="text-gray-300 hover:text-smart-green transition-colors">Awareness</a></li>
+                         <li><a href="blog.html" class="text-gray-300 hover:text-smart-green transition-colors">Blog</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-smart-green transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Right Column: Social Media -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Follow Us</h4>
+                    <div class="flex justify-center md:justify-start space-x-5">
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Twitter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-700 mt-10 pt-6 text-center text-sm text-gray-500">
+                <p>&copy; 2025 Clean City Initiative. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full relative">
+            <!-- Close Button -->
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <h3 class="text-2xl font-bold text-smart-dark mb-4">Reset Password</h3>
+            <p class="text-smart-gray mb-6">Enter your email address and we'll send you a link to reset your password.</p>
+            
+            <form id="reset-form" class="space-y-4">
+                <div>
+                    <label for="reset-email" class="block text-sm font-medium text-smart-gray mb-1">Email</label>
+                    <input type="email" id="reset-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-smart-blue focus:border-transparent" placeholder="you@example.com">
+                </div>
+                
+                <!-- Reset Status Message -->
+                <div id="reset-status" class="text-center"></div>
+
+                <button type="submit" class="w-full bg-smart-blue text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-300">
+                    Send Reset Link
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- JavaScript for Micro-interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+            
+            // Show/Hide Password
+            const togglePasswordBtn = document.getElementById('toggle-password');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            const eyeOffIcon = document.getElementById('eye-off-icon');
+
+            togglePasswordBtn.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle icon visibility
+                eyeIcon.classList.toggle('hidden');
+                eyeOffIcon.classList.toggle('hidden');
+            });
+
+            // Handle Login Form Submission
+            const loginForm = document.getElementById('login-form');
+            const formStatus = document.getElementById('form-status');
+
+            loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+        formStatus.innerHTML = `
+            <p class="text-red-600 font-semibold p-3 bg-red-100 rounded-lg">
+                Please fill in all fields.
+            </p>
+        `;
+        return;
+    }
+
+    try {
+        const response = await fetch('https://novomesh-backend.onrender.com/admin-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+});
+
+        let data;
+        const text = await response.text();
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch (err) {
+          console.error("Invalid JSON:", text);
+          throw new Error("Server returned invalid response");
+        }
+
+        if (response.ok) {
+
+    if (!data.token) {
+    formStatus.innerHTML = `
+        <p class="text-red-600 font-semibold p-3 bg-red-100 rounded-lg">
+            Login failed. Token not received.
+        </p>
+    `;
+    return;
+}
+
+localStorage.setItem("token", data.token);
+
+    formStatus.innerHTML = `
+        <p class="text-green-600 font-semibold p-3 bg-green-100 rounded-lg">
+            Login Successful! Redirecting...
+        </p>
+    `;
+
+    setTimeout(() => {
+        window.location.href = "admin_dashboard.html";
+    }, 1200);
+} else {
+            formStatus.innerHTML = `
+                <p class="text-red-600 font-semibold p-3 bg-red-100 rounded-lg">
+                    ${data.message || 'Login failed. Please try again.'}
+                </p>
+            `;
+        }
+
+    } catch (error) {
+        console.error('Login error:', error);
+        formStatus.innerHTML = `
+            <p class="text-red-600 font-semibold p-3 bg-red-100 rounded-lg">
+                Network error. Please try again.
+            </p>
+        `;
+    }
+});
+
+
+            // Handle Forgot Password Modal
+            const modal = document.getElementById('forgot-password-modal');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const resetForm = document.getElementById('reset-form');
+            const resetStatus = document.getElementById('reset-status');
+
+            forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                modal.classList.remove('hidden');
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                resetStatus.innerHTML = '';
+                resetForm.reset();
+            });
+
+            // Close modal by clicking on the backdrop
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    resetStatus.innerHTML = '';
+                    resetForm.reset();
+                }
+            });
+
+            // Handle Reset Form Submission
+            resetForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const resetEmail = document.getElementById('reset-email').value;
+
+                if (resetEmail) {
+                    resetStatus.innerHTML = `
+                        <p class="text-smart-green font-semibold text-sm p-3 bg-smart-green-light rounded-lg">
+                            If an account exists for ${resetEmail}, a reset link has been sent.
+                        </p>
+                    `;
+                    resetForm.reset();
+                    // setTimeout(() => { modal.classList.add('hidden'); resetStatus.innerHTML = ''; }, 3000);
+                } else {
+                     resetStatus.innerHTML = `
+                        <p class="text-red-600 font-semibold text-sm p-3 bg-red-100 rounded-lg">
+                            Please enter your email address.
+                        </p>
+                    `;
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
+

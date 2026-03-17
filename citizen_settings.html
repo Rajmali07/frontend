@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings - Citizen Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'smart-green': '#28a745',
+            'smart-green-light': '#dcfce7',
+            'smart-blue': '#17a2b8',
+            'smart-yellow': '#ffc107',
+            'smart-dark': '#333333',
+            'smart-gray': '#6c757d',
+          },
+          fontFamily: { 'roboto': ['Roboto', 'sans-serif'] },
+          boxShadow: {
+            'header': '0 2px 6px rgba(0,0,0,0.1)',
+            'card': '0 4px 12px rgba(0,0,0,0.1)',
+            'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+            'top': '0 -2px 6px rgba(0,0,0,0.1)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-roboto text-smart-dark antialiased bg-[#f8f9fa]">
+
+  <header class="bg-white shadow-header fixed top-0 left-0 right-0 z-40">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+      <a href="index.html" class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span class="text-xl font-bold text-smart-green hidden sm:block">Citizen Portal</span>
+      </a>
+
+      <div class="relative">
+        <button id="profile-btn" class="flex items-center space-x-2 focus:outline-none">
+          <span id="user-greeting" class="text-smart-dark font-medium hidden md:block">Hello, Citizen!</span>
+          <img id="user-avatar" class="w-10 h-10 rounded-full object-cover border-2 border-smart-green"
+            src="https://placehold.co/100x100/EAF7E8/28a745?text=U" alt="Profile Picture">
+        </button>
+
+        <div id="profile-dropdown"
+          class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 hidden">
+          <a href="citizen_profile.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">View Profile</a>
+          <a href="citizen_settings.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">Settings</a>
+          <div class="border-t border-gray-100 my-1"></div>
+          <a href="index.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100" id="logout-btn">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+    <h1 class="text-3xl font-bold text-smart-dark mb-6">Account Settings</h1>
+
+    <form id="settings-form">
+      <div class="bg-white p-6 sm:p-8 rounded-xl shadow-card mb-6">
+        <h2 class="text-xl font-bold text-smart-dark border-b border-gray-200 pb-3 mb-6">Profile Information</h2>
+
+        <div class="flex items-center space-x-4 mb-6">
+          <img id="profile-photo" class="w-20 h-20 rounded-full object-cover border-2 border-smart-green"
+            src="https://placehold.co/200x200/EAF7E8/28a745?text=U" alt="Profile Picture">
+          <div>
+            <label for="profile-pic-upload"
+              class="cursor-pointer bg-smart-blue text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+              Upload New Photo
+            </label>
+            <input type="file" id="profile-pic-upload" name="photo" class="hidden" accept="image/png, image/jpeg, image/gif">
+            <p class="text-xs text-smart-gray mt-2">Preview only for now. PNG, JPG, or GIF.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-smart-gray mb-1">Full Name</label>
+            <input type="text" id="full-name" name="full_name"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-smart-green" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-smart-gray mb-1">Phone Number</label>
+            <input type="tel" id="phone" name="phone"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-smart-green" />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-smart-gray mb-1">Address</label>
+            <textarea id="address" name="address" rows="3"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-smart-green"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 sm:p-8 rounded-xl shadow-card mb-6">
+        <h2 class="text-xl font-bold text-smart-dark border-b border-gray-200 pb-3 mb-6">Change Password</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-smart-gray mb-1">Current Password</label>
+            <input type="password" id="current-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-smart-green" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-smart-gray mb-1">New Password</label>
+            <input type="password" id="new-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-smart-green" />
+          </div>
+        </div>
+        <button type="button" id="change-password-btn"
+          class="mt-4 bg-smart-green text-white py-2 px-5 rounded-lg shadow hover:bg-green-700 transition">Update Password</button>
+      </div>
+
+      <div class="bg-white p-6 sm:p-8 rounded-xl shadow-card mb-6">
+        <h2 class="text-xl font-bold text-smart-dark border-b border-gray-200 pb-3 mb-6">Notification Settings</h2>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <div><p class="font-medium">Email Notifications</p></div>
+            <input type="checkbox" id="toggle-email" class="h-5 w-5 text-smart-green">
+          </div>
+          <div class="flex justify-between items-center">
+            <div><p class="font-medium">Push Notifications</p></div>
+            <input type="checkbox" id="toggle-push" class="h-5 w-5 text-smart-green">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <a href="citizen_profile.html"
+          class="bg-gray-200 text-smart-dark font-medium py-3 px-6 rounded-lg hover:bg-gray-300">Cancel</a>
+        <button type="submit"
+          class="bg-smart-green text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-green-700 transition">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const user = JSON.parse(localStorage.getItem("citizenUser"));
+      if (!user) {
+        alert("Please login first!");
+        window.location.href = "citizen_login.html";
+        return;
+      }
+
+      const email = user.email;
+      const notificationStorageKey = "citizenNotificationSettings";
+      const fullNameInput = document.getElementById("full-name");
+      const phoneInput = document.getElementById("phone");
+      const addressInput = document.getElementById("address");
+      const profilePhoto = document.getElementById("profile-photo");
+      const userGreeting = document.getElementById("user-greeting");
+      const userAvatar = document.getElementById("user-avatar");
+      const profileBtn = document.getElementById("profile-btn");
+      const profileDropdown = document.getElementById("profile-dropdown");
+      const toggleEmail = document.getElementById("toggle-email");
+      const togglePush = document.getElementById("toggle-push");
+      const profilePicUpload = document.getElementById("profile-pic-upload");
+
+      const applyCitizenData = (citizen) => {
+        const username = citizen.username || "Citizen";
+        const avatarLetter = username.charAt(0).toUpperCase();
+
+        userGreeting.textContent = `Hello, ${username}!`;
+        fullNameInput.value = username;
+        phoneInput.value = citizen.phone || "";
+        addressInput.value = citizen.address || "";
+        profilePhoto.src = citizen.photo_url || `https://placehold.co/200x200/EAF7E8/28a745?text=${avatarLetter}`;
+        userAvatar.src = citizen.photo_url || `https://placehold.co/100x100/EAF7E8/28a745?text=${avatarLetter}`;
+      };
+
+      const loadNotificationSettings = () => {
+        const savedSettings = JSON.parse(localStorage.getItem(notificationStorageKey) || "{}");
+        toggleEmail.checked = savedSettings.email !== false;
+        togglePush.checked = savedSettings.push === true;
+      };
+
+      const saveNotificationSettings = () => {
+        localStorage.setItem(notificationStorageKey, JSON.stringify({
+          email: toggleEmail.checked,
+          push: togglePush.checked
+        }));
+      };
+
+      try {
+        const res = await fetch(`https://novomesh-backend.onrender.com/api/v1/citizen/${email}`);
+        const data = await res.json();
+
+        if (res.ok && data.user) {
+          localStorage.setItem("citizenUser", JSON.stringify(data.user));
+          applyCitizenData(data.user);
+        } else {
+          applyCitizenData(user);
+        }
+      } catch (err) {
+        console.error("Fetch profile error:", err);
+        applyCitizenData(user);
+      }
+
+      loadNotificationSettings();
+
+      profileBtn.addEventListener("click", () => {
+        profileDropdown.classList.toggle("hidden");
+      });
+
+      window.addEventListener("click", (e) => {
+        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+          profileDropdown.classList.add("hidden");
+        }
+      });
+
+      profilePicUpload.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          profilePhoto.src = e.target.result;
+          userAvatar.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById("settings-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const currentUser = JSON.parse(localStorage.getItem("citizenUser"));
+        if (!currentUser || !currentUser.email) {
+          alert("No user found. Please log in again.");
+          return;
+        }
+
+        const userData = {
+          id: currentUser.id,
+          username: fullNameInput.value.trim(),
+          phone: phoneInput.value.trim(),
+        };
+
+        try {
+          const response = await fetch("https://novomesh-backend.onrender.com/api/citizen/update", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.data && data.data[0]) {
+            alert("Profile updated successfully!");
+            localStorage.setItem("citizenUser", JSON.stringify(data.data[0]));
+            applyCitizenData(data.data[0]);
+            saveNotificationSettings();
+          } else {
+            alert(data.error || "Could not update profile");
+          }
+        } catch (err) {
+          console.error("Error updating profile:", err);
+          alert("Network error. Please try again later.");
+        }
+      });
+
+      document.getElementById("change-password-btn").addEventListener("click", async () => {
+        const currentPassword = document.getElementById("current-password").value;
+        const newPassword = document.getElementById("new-password").value;
+
+        if (!currentPassword || !newPassword) {
+          alert("Fill both password fields");
+          return;
+        }
+
+        try {
+          const res = await fetch("https://novomesh-backend.onrender.com/api/v1/citizen/password", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, currentPassword, newPassword }),
+          });
+          const data = await res.json();
+
+          if (res.ok) {
+            alert("Password updated successfully!");
+            document.getElementById("current-password").value = "";
+            document.getElementById("new-password").value = "";
+          } else {
+            alert(data.message || "Password change failed");
+          }
+        } catch (err) {
+          console.error("Password update error:", err);
+          alert("Server error updating password");
+        }
+      });
+
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        localStorage.removeItem("citizenUser");
+        localStorage.removeItem(notificationStorageKey);
+      });
+    });
+  </script>
+</body>
+</html>

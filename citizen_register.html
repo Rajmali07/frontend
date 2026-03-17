@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Portal Registration - Clean City</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'smart-green': '#28a745',
+            'smart-green-light': '#dcfce7',
+            'smart-blue': '#17a2b8',
+            'smart-yellow': '#ffc107',
+            'smart-dark': '#333',
+            'smart-gray': '#6c757d',
+          },
+          fontFamily: { 'roboto': ['Roboto', 'sans-serif'] },
+          height: { '80px': '80px' },
+          minHeight: { '60px': '60px' },
+          boxShadow: {
+            'header': '0 2px 6px rgba(0,0,0,0.1)',
+            'card': '0 4px 12px rgba(0,0,0,0.1)',
+            'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body { font-family: 'Roboto', sans-serif; }
+
+    .nav-link {
+      position: relative;
+      color: #333;
+      transition: color 0.3s;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #28a745;
+      transition: width 0.3s;
+    }
+    .nav-link:hover {
+      color: #28a745;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .main-content {
+      min-height: calc(100vh - 160px);
+    }
+  </style>
+</head>
+
+<body class="font-roboto text-smart-dark antialiased">
+  <!-- Header -->
+  <header class="bg-white shadow-header sticky top-0 z-50">
+    <nav class="container mx-auto px-4 flex justify-between items-center h-[80px] min-h-[60px]">
+      <a href="index.html" class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+        </svg>
+        <span class="text-xl font-bold text-smart-green">Clean City</span>
+      </a>
+
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="awareness.html" class="nav-link">Awareness</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </div>
+
+      <button id="menu-btn" class="md:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </nav>
+
+    <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+      <a href="index.html" class="block px-6 py-3 hover:bg-gray-50">Home</a>
+      <a href="about.html" class="block px-6 py-3 hover:bg-gray-50">About</a>
+      <a href="awareness.html" class="block px-6 py-3 hover:bg-gray-50">Awareness</a>
+      <a href="blog.html" class="block px-6 py-3 hover:bg-gray-50">Blog</a>
+      <a href="contact.html" class="block px-6 py-3 hover:bg-gray-50">Contact</a>
+    </div>
+  </header>
+
+  <!-- Registration Form -->
+  <main class="main-content bg-gray-50 flex items-center justify-center py-20 px-4">
+    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-card border-t-4 border-smart-green">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold">Create Citizen Account</h2>
+        <p class="text-smart-gray mt-2">Join Clean City to report issues and track complaints.</p>
+      </div>
+
+      <form id="register-form" class="space-y-6">
+        <input type="email" id="email" placeholder="you@example.com" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-smart-green">
+        <input type="text" id="username" placeholder="yourusername" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-smart-green">
+        <div class="relative">
+          <input type="password" id="password" placeholder="••••••••" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-smart-green">
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-3 flex items-center">
+            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="hidden" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg id="eye-off-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <path d="M12 12a3 3 0 0 1 4.24 4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <input type="password" id="confirm-password" placeholder="Confirm password" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-smart-green">
+
+        <label class="flex items-start space-x-2 text-sm text-smart-gray">
+          <input type="checkbox" id="terms" class="mt-1">
+          <span>I agree to the <a href="#" class="text-smart-green">Terms and Conditions</a> and <a href="#" class="text-smart-green">Privacy Policy</a></span>
+        </label>
+
+        <div id="form-status" class="text-center"></div>
+
+        <button type="submit" class="w-full py-3 text-white font-bold bg-smart-green rounded-lg hover:bg-green-700 transition">
+          Create Account
+        </button>
+      </form>
+
+      <p class="text-center text-sm text-smart-gray mt-6">
+        Already have an account?
+        <a href="citizen_login.html" class="text-smart-green hover:text-green-700">Sign in here</a>
+      </p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-smart-dark text-white py-12 text-center text-sm">
+    <p>&copy; 2025 Clean City Initiative. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+    // Password toggle
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeOffIcon = document.getElementById('eye-off-icon');
+
+    togglePasswordBtn.addEventListener('click', () => {
+      const isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      eyeIcon.classList.toggle('hidden');
+      eyeOffIcon.classList.toggle('hidden');
+    });
+
+    // Registration logic
+    const registerForm = document.getElementById('register-form');
+    const formStatus = document.getElementById('form-status');
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const emailInput = document.getElementById('email');
+      const usernameInput = document.getElementById('username');
+      const password = document.getElementById('password').value.trim();
+      const confirmPassword = document.getElementById('confirm-password').value.trim();
+      const termsAccepted = document.getElementById('terms').checked;
+
+      const email = emailInput.value.trim();
+      const username = usernameInput.value.trim();
+
+      if (!email || !username || !password || !confirmPassword)
+        return showError("Please fill in all fields.");
+      if (password !== confirmPassword)
+        return showError("Passwords do not match.");
+      if (!termsAccepted)
+        return showError("Please accept the Terms and Conditions.");
+
+      try {
+        formStatus.innerHTML = `<p class="text-blue-600 font-medium">Registering, please wait...</p>`;
+        const res = await fetch("https://novomesh-backend.onrender.com/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, username, password, role: "citizen" }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          formStatus.innerHTML = `<p class="text-green-600 font-semibold bg-green-100 p-3 rounded-lg">${data.message || "Account created successfully!"}</p>`;
+          setTimeout(() => (window.location.href = "citizen_login.html"), 2000);
+        } else {
+          showError(data.error || data.message || "Registration failed.");
+        }
+      } catch (err) {
+        console.error(err);
+        showError("Network error. Please check your connection.");
+      }
+    });
+
+    function showError(msg) {
+      formStatus.innerHTML = `<p class="text-red-600 font-semibold bg-red-100 p-3 rounded-lg">${msg}</p>`;
+    }
+  });
+</script>
+
+</body>
+</html>

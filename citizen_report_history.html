@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Complaint History</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-8">
+
+<h1 class="text-3xl font-bold mb-6">All Your Complaints</h1>
+
+<div id="complaints-container" class="space-y-4"></div>
+
+<script>
+
+const user = JSON.parse(localStorage.getItem("citizenUser"));
+
+if(!user){
+    window.location.href = "citizen_login.html";
+}
+
+async function loadComplaints(){
+
+const res = await fetch(`https://novomesh-backend.onrender.com/api/v1/civic_reports/${user.email}`);
+const data = await res.json();
+
+const container = document.getElementById("complaints-container");
+
+if(data.reports.length === 0){
+container.innerHTML = "<p>No complaints found</p>";
+return;
+}
+
+container.innerHTML = data.reports.map(r => {
+
+return `
+<div class="bg-white p-4 rounded shadow">
+
+<div class="flex justify-between">
+
+<div>
+<h2 class="font-bold text-lg">${r.issue_type}</h2>
+<p>ID: ${r.complaint_id}</p>
+<p>${r.location}</p>
+<p>${new Date(r.created_at).toLocaleDateString()}</p>
+</div>
+
+<div>
+<span class="px-3 py-1 rounded bg-yellow-200">${r.status}</span>
+</div>
+
+</div>
+
+<div class="flex gap-6 mt-4">
+
+<div>
+<p class="text-sm font-semibold">Before</p>
+<img src="${r.photo_url}" 
+class="w-32 h-24 object-cover rounded shadow">
+</div>
+
+${
+r.driver_photo_url
+? `
+<div>
+<p class="text-sm font-semibold">After</p>
+<img src="${r.driver_photo_url}" 
+class="w-32 h-24 object-cover rounded shadow">
+</div>
+`
+: ""
+}
+
+</div>
+
+</div>
+`
+
+}).join("");
+
+}
+
+loadComplaints();
+
+</script>
+
+</body>
+</html>

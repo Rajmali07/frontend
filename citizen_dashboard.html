@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Dashboard - Clean City</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'smart-green': '#28a745',
+            'smart-green-light': '#dcfce7',
+            'smart-blue': '#17a2b8',
+            'smart-yellow': '#ffc107',
+            'smart-dark': '#333333',
+            'smart-gray': '#6c757d',
+          },
+          fontFamily: { 'roboto': ['Roboto', 'sans-serif'] },
+          boxShadow: {
+            'header': '0 2px 6px rgba(0,0,0,0.1)',
+            'card': '0 4px 12px rgba(0,0,0,0.1)',
+            'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+            'top': '0 -2px 6px rgba(0,0,0,0.1)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+  </style>
+</head>
+<body class="font-roboto text-smart-dark antialiased">
+
+  <!-- Header -->
+  <header class="bg-white shadow-header fixed top-0 left-0 right-0 z-40">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+      <a href="index.html" class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span class="text-xl font-bold text-smart-green hidden sm:block">Citizen Portal</span>
+      </a>
+
+      <div class="relative">
+        <button id="profile-btn" class="flex items-center space-x-2 focus:outline-none">
+          <span id="username-display" class="text-smart-dark font-medium hidden md:block">Hello!</span>
+          <img id="user-avatar" class="w-10 h-10 rounded-full object-cover border-2 border-smart-green"
+            src="https://placehold.co/100x100/EAF7E8/28a745?text=U" alt="Profile Picture">
+        </button>
+        <div id="profile-dropdown"
+          class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 hidden">
+          <a href="citizen_profile.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">View Profile</a>
+          <a href="citizen_settings.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">Settings</a>
+          <div class="border-t border-gray-100 my-1"></div>
+          <a href="#" id="logout-link" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+    <section class="mb-6">
+      <h1 id="welcome-message" class="text-3xl font-bold text-smart-dark">Hello, User! 👋</h1>
+      <p id="user-area" class="text-smart-gray text-lg">Loading...</p>
+    </section>
+
+    <div class="mt-4">
+  <a href="citizen_report_civic.html"
+     class="inline-flex items-center px-6 py-3 bg-smart-green text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="20"
+         height="20"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="mr-2">
+
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+
+    </svg>
+
+    Report New Issue
+  </a>
+</div>
+
+    <!-- Quick Stats -->
+    <section id="stats-section" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-xl shadow-card flex items-center space-x-3">
+        <div class="p-3 rounded-full bg-smart-green-light">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </div>
+        <div>
+          <div id="total-reports" class="text-2xl font-bold text-smart-dark">0</div>
+          <div class="text-sm text-smart-gray">Total Submitted</div>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-card flex items-center space-x-3">
+        <div class="p-3 rounded-full bg-yellow-100">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-600">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <div id="active-reports" class="text-2xl font-bold text-smart-dark">0</div>
+          <div class="text-sm text-smart-gray">Active</div>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-card flex items-center space-x-3">
+        <div class="p-3 rounded-full bg-blue-100">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-blue">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div id="resolved-reports" class="text-2xl font-bold text-smart-dark">0</div>
+          <div class="text-sm text-smart-gray">Resolved</div>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-card flex items-center space-x-3">
+        <div class="p-3 rounded-full bg-red-100">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600">
+            <path d="M3 6h18"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-smart-dark">82%</div>
+          <div class="text-sm text-smart-gray">Nearby Bins</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Complaints -->
+    <section id="recent-section" class="bg-white p-6 rounded-xl shadow-card mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-smart-dark">Recent Complaints</h2>
+        <a href="./citizen_report_history.html" class="text-sm font-medium text-smart-green hover:underline">View All</a>
+      </div>
+      <div id="complaints-list" class="space-y-4">
+        <p class="text-smart-gray">Loading recent complaints...</p>
+      </div>
+    </section>
+
+    <!-- Analytics -->
+    <section class="bg-white p-6 rounded-xl shadow-card">
+      <h2 class="text-xl font-bold text-smart-dark mb-4">Your Activity</h2>
+      <canvas id="activityChart" height="150"></canvas>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-top z-40 h-16 flex justify-around items-center md:hidden">
+    <a href="citizen_dashboard.html" class="flex flex-col items-center text-smart-green p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="mb-1">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      </svg>
+      <span class="text-xs font-medium">Home</span>
+    </a>
+    <a href="citizen_report_bin.html"
+      class="flex flex-col items-center text-smart-gray hover:text-smart-green p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1">
+        <path d="M3 6h18"></path>
+      </svg>
+      <span class="text-xs font-medium">Report</span>
+    </a>
+    <a href="./citizen_report_history.html"
+      class="flex flex-col items-center text-smart-gray hover:text-smart-green p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+      </svg>
+      <span class="text-xs font-medium">History</span>
+    </a>
+    <a href="citizen_profile.html"
+      class="flex flex-col items-center text-smart-gray hover:text-smart-green p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      </svg>
+      <span class="text-xs font-medium">Profile</span>
+    </a>
+  </nav>
+
+  <!-- JS -->
+  <script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = JSON.parse(localStorage.getItem("citizenUser"));
+  let reports = [];
+
+  if (!user) {
+    window.location.href = "citizen_login.html";
+    return;
+  }
+
+  // Display username
+  document.getElementById("username-display").textContent = `Hello, ${user.username}!`;
+  document.getElementById("welcome-message").textContent = `Hello, ${user.username}! 👋`;
+  const initials = user.username ? user.username.charAt(0).toUpperCase() : "U";
+  document.getElementById("user-avatar").src = `https://placehold.co/100x100/EAF7E8/28a745?text=${initials}`;
+
+  try {
+    const res = await fetch(`https://novomesh-backend.onrender.com/api/v1/civic_reports/${user.email}`);
+    const data = await res.json();
+
+    if (res.ok && data.reports) {
+      reports = data.reports;
+
+      // ✅ Dashboard summary counts
+      const activeStatuses = ["pending", "in progress", "assigned"];
+      const resolvedStatuses = ["verified", "resolved", "completed", "closed"];
+
+      const totalSubmitted = reports.length;
+      const active = reports.filter(r =>
+        activeStatuses.includes(r.status?.toLowerCase())
+      ).length;
+
+      const resolved = reports.filter(r =>
+        resolvedStatuses.includes(r.status?.toLowerCase())
+      ).length;
+
+      document.getElementById("total-reports").textContent = totalSubmitted;
+      document.getElementById("active-reports").textContent = active;
+      document.getElementById("resolved-reports").textContent = resolved;
+
+      // ✅ Recent complaints list
+      const list = document.getElementById("complaints-list");
+      if (reports.length === 0) {
+        list.innerHTML = `<p class="text-smart-gray">No complaints submitted yet.</p>`;
+      } else {
+        list.innerHTML = reports
+  .slice(0, 3)
+  .map((r) => {
+    const status = r.status?.toLowerCase();
+
+    const statusClass =
+  ["verified","completed","resolved"].includes(status)
+        ? "bg-smart-blue text-white"
+        : "bg-yellow-200 text-yellow-800";
+
+    return `
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border">
+        <div class="mb-2 sm:mb-0">
+          <div class="font-semibold text-smart-dark capitalize">${r.issue_type || "General Issue"}</div>
+          <div class="text-sm text-smart-gray">
+            ID: #${r.complaint_id} • ${new Date(r.created_at).toLocaleDateString()}
+          </div>
+          <div class="text-sm text-smart-gray">${r.location || "No location provided"}</div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <span class="text-xs font-medium px-3 py-1 rounded-full ${statusClass}">
+            ${r.status}
+          </span>
+        </div>
+      </div>`;
+  })
+  .join("");
+      }
+    } else {
+      console.warn("No data or bad response:", data);
+    }
+  } catch (err) {
+    console.error("Error loading reports:", err);
+    document.getElementById("complaints-list").innerHTML = `<p class="text-red-600">Error fetching reports.</p>`;
+  }
+
+  // ✅ Chart from real report data
+  const ctx = document.getElementById("activityChart").getContext("2d");
+  const weeklyLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weeklyCounts = [0, 0, 0, 0, 0, 0, 0];
+
+  reports.forEach((report) => {
+    if (!report.created_at) return;
+
+    const createdDate = new Date(report.created_at);
+    const jsDay = createdDate.getDay();
+    const labelIndex = jsDay === 0 ? 6 : jsDay - 1;
+    weeklyCounts[labelIndex] += 1;
+  });
+
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: weeklyLabels,
+      datasets: [{
+        label: "Complaints This Week",
+        data: weeklyCounts,
+        backgroundColor: "rgba(40,167,69,0.1)",
+        borderColor: "#28a745",
+        borderWidth: 2,
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+
+  // ✅ Logout
+  document.getElementById("logout-link").addEventListener("click", (e) => {
+    e.preventDefault();
+    localStorage.removeItem("citizenUser");
+    window.location.href = "citizen_login.html";
+  });
+
+  // ✅ Dropdown
+  const profileBtn = document.getElementById("profile-btn");
+  const dropdown = document.getElementById("profile-dropdown");
+  profileBtn.addEventListener("click", () => dropdown.classList.toggle("hidden"));
+  window.addEventListener("click", (e) => {
+    if (!profileBtn.contains(e.target)) dropdown.classList.add("hidden");
+  });
+});
+</script>
+</body>
+</html>

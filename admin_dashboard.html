@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Swach Raipur</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Theme configuration remains for consistency
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (savedTheme === 'system' && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            const style = document.createElement('style');
+            style.textContent = `
+                body { background-color: #1a202c !important; }
+            `;
+            document.head.appendChild(style);
+        }
+    </script>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "admin_login.html";
+    return;
+  }
+});
+</script>
+
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable dark mode via class
+            theme: {
+                extend: {
+                    colors: {
+                        // All theme colors defined using CSS variables (see <style> block below)
+                        'smart-green': 'var(--color-smart-green, #28a745)', 
+                        'smart-green-dark': '#208135', // Darker shade for hover/active
+                        'smart-blue': 'var(--color-smart-blue, #17a2b8)', 
+                        'smart-yellow': 'var(--color-smart-yellow, #ffc107)', 
+                        'smart-red': 'var(--color-smart-red, #dc3545)', 
+                        'smart-gray': 'var(--color-smart-gray, #6c757d)',
+                        'background-light': 'var(--color-background-light, #f8f9fa)',
+                        'card-background-light': 'var(--color-card-background-light, #ffffff)',
+                        'text-light': 'var(--color-text-light, #333333)',
+                        'border-light': 'var(--color-border-light, #e2e8f0)',
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'header': '0 2px 6px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.08)',
+                        'sidebar': '4px 0 15px rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base styles for theme variables */
+        :root {
+            --color-smart-green: #28a745;
+            --color-smart-blue: #17a2b8;
+            --color-smart-yellow: #ffc107;
+            --color-smart-red: #dc3545;
+            --color-smart-gray: #6c757d;
+            --color-background-light: #f8f9fa;
+            --color-card-background-light: #ffffff;
+            --color-text-light: #333333;
+            --color-border-light: #e2e8f0;
+            --sidebar-bg: #28a745; /* LIGHT MODE: Solid Green */
+            --sidebar-text: #ffffff;
+            --sidebar-hover-bg: #208135; /* Darker Green for hover */
+            --sidebar-active-bg: #208135; /* Darker Green for active */
+        }
+        
+        /* Dark Mode adjustments for content area */
+        .dark {
+            --color-background-light: #1a202c;
+            --color-card-background-light: #2d3748;
+            --color-text-light: #e2e8f0;
+            --color-border-light: #4a5568;
+            
+            /* DARK MODE SIDEBAR OVERRIDE (FIXED) */
+            --sidebar-bg: #1a472a; 
+            --sidebar-hover-bg: #208135;
+            --sidebar-active-bg: #208135;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--color-background-light);
+            color: var(--color-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Sidebar Styling (Solid Green) */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            box-shadow: var(--tw-shadow-sidebar);
+        }
+        .sidebar-link {
+            transition: background-color 0.2s, color 0.2s;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-link:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-text);
+        }
+        .sidebar-link.active {
+            background-color: var(--sidebar-active-bg);
+            font-weight: 700;
+            color: var(--sidebar-text);
+        }
+        .sidebar-footer-link:hover {
+            color: #ffc107;
+            text-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+        }
+
+        /* Generic card styling for consistency */
+        .card {
+            background-color: var(--color-card-background-light);
+            border-radius: 0.75rem;
+            box-shadow: var(--tw-shadow-card, 0 4px 12px rgba(0,0,0,0.08));
+            padding: 1.5rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            color: var(--color-text-light);
+        }
+        /* Zone Card Specific Styling - FINALIZED */
+        .zone-card {
+            height: 150px; 
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--color-border-light); 
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+            justify-content: center;
+        }
+        .zone-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        .zone-number-badge { /* New class for the number badge */
+            position: absolute;
+            top: 10px;
+            right: 15px; /* Adjust for padding */
+            font-size: 1.8rem; /* Large enough to be prominent */
+            font-weight: 900;
+            line-height: 1; /* Keep it tight */
+        }
+        .zone-card .zone-name {
+            font-size: 2.25rem; /* Large size for prominent name */
+            font-weight: 700;
+            margin-bottom: 0; /* Remove bottom margin */
+        }
+
+        /* Styles for Solid Action Buttons (from original CSS) */
+        .action-button-base { transition: all 0.3s ease; }
+        .action-button-base:hover { box-shadow: 0 8px 16px rgba(0,0,0,0.15); transform: scale(1.02); }
+
+        /* Complaint Card Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body class="font-roboto antialiased flex min-h-screen">
+    
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden"></div>
+
+    <aside id="sidebar" class="sidebar fixed top-0 bottom-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+        
+        <div class="p-6 flex items-center space-x-3 flex-shrink-0">
+            <img src="assets/logo/swachchh_raipur.svg" alt="Swach Raipur Logo" class="h-10 w-auto rounded-lg">
+            <div>
+                <h1 class="text-xl font-bold text-white leading-tight">Swach Raipur</h1>
+                <p class="text-sm font-light text-green-100 leading-tight">Admin Panel</p>
+            </div>
+        </div>
+
+        <nav class="flex-grow space-y-2 p-4 pt-6 text-base">
+            <a href="admin_dashboard.html" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="zones.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>Zones</span>
+            </a>
+            <a href="admin_task_review.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>Task Review</span>
+            </a>
+            <a href="admin_user_management.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                <span>Driver Management</span>
+            </a>
+            <a href="admin_feedback.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Feedback</span>
+            </a>
+            <a href="admin_blogs.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="11" x2="15" y2="11"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>
+                <span>Blog</span>
+            </a>
+            <a href="analytics.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4"></path><polyline points="17 9 12 4 7 9"></polyline><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                <span>Analytics</span>
+            </a>
+            <a href="profile.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Profile</span>
+            </a>
+            <a href="admin_settings.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09z"></path></svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-6 flex-shrink-0 border-t border-green-700">
+            <a href="index.html" id="admin-logout-link" class="sidebar-footer-link flex items-center justify-center space-x-2 p-3 rounded-lg text-yellow-300 font-semibold transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span class="text-sm">LOGOUT</span>
+            </a>
+        </div>
+    </aside>
+
+    <header class="bg-white dark:bg-card-background-light shadow-header fixed top-0 left-0 right-0 z-40 h-16 transition-colors duration-300 lg:hidden">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
+            <a href="admin_dashboard.html" class="flex items-center space-x-2">
+                <img src="assets/logo/swachchh_raipur.svg" alt="Logo" class="h-10 w-auto">
+                <span class="text-xl font-bold text-smart-dark dark:text-text-light">Dashboard</span>
+            </a>
+            <button id="hamburger-btn" class="text-smart-dark dark:text-text-light p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-smart-green transition-colors duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="lg:ml-[280px] flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-8 pb-12 transition-colors duration-300">
+        
+        <section class="mb-6">
+            <h1 class="text-3xl font-bold text-smart-dark dark:text-text-light">Dashboard Overview</h1>
+            <p class="text-smart-gray dark:text-gray-400">Real-time performance metrics and city status.</p>
+        </section>
+
+        <h2 class="text-xl font-semibold text-smart-dark dark:text-text-light mb-3">Today's Performance</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+            <div class="card p-6 flex flex-col items-center justify-center border-t-4 border-smart-green">
+                <h3 class="text-lg font-semibold text-smart-gray dark:text-gray-300">Solved Complaints</h3>
+                <div id="solvedCount" class="text-smart-green text-5xl font-extrabold mt-2">0</div>
+            </div>
+            <div class="card p-6 flex flex-col items-center justify-center border-t-4 border-smart-red">
+                <h3 class="text-lg font-semibold text-smart-gray dark:text-gray-300">Pending Complaints</h3>
+                <div id="pendingCount" class="text-smart-red text-5xl font-extrabold mt-2">0</div>
+            </div>
+            <div class="card p-6 flex flex-col items-center justify-center border-t-4 border-smart-blue">
+                <h3 class="text-lg font-semibold text-smart-gray dark:text-gray-300">Total Complaints</h3>
+                <div id="totalCount" class="text-smart-blue text-5xl font-extrabold mt-2">0</div>
+            </div>
+        </div>
+        
+        <h2 class="text-xl font-semibold text-smart-dark dark:text-text-light mb-3">All-Time Metrics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card p-6 flex flex-col items-center justify-center border-t-4 border-smart-blue">
+                <h3 class="text-lg font-semibold text-smart-gray dark:text-gray-300">Total Bins Monitored</h3>
+                <div id="allTimeMonitoredCount" class="text-smart-blue text-5xl font-extrabold mt-2">0</div>
+            </div>
+            <div class="card p-6 flex flex-col items-center justify-center border-t-4 border-smart-green">
+                <h3 class="text-lg font-semibold text-smart-gray dark:text-gray-300">Total Solved Rate</h3>
+                <div id="allTimeSolvedRate" class="text-smart-green text-5xl font-extrabold mt-2">0%</div>
+            </div>
+            <div class="card p-6 flex flex-col items-center justify-center border-t-4 border-smart-yellow">
+                <h3 class="text-lg font-semibold text-smart-gray dark:text-gray-300">Active Crew Members</h3>
+                <div id="activeCrewCount" class="text-smart-yellow text-5xl font-extrabold mt-2">0</div>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-smart-dark dark:text-text-light mb-3">City Zone Overview</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <section id="complaint-list" class="space-y-4 mt-6">
+                <!-- Complaints will be dynamically injected here -->
+            </section>
+        </div>
+
+        <!-- Added section for complaint cards -->
+        <h2 class="text-xl font-semibold text-smart-dark dark:text-text-light mb-3">Recent Complaints</h2>
+        <div id="complaints-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <!-- Complaint cards will be injected here -->
+        </div>
+
+        <h2 class="text-xl font-semibold text-smart-dark dark:text-text-light mb-3">Operational Statistics</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4">Complaints Resolved by Zone (Weekly)</h2>
+                <canvas id="complaintsChart"></canvas>
+            </div>
+
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4">Garbage Generation vs. Disposal (Monthly)</h2>
+                <canvas id="garbageChart"></canvas>
+            </div>
+        </div>
+
+    </main>
+
+<!-- Load Supabase first -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Initialize Supabase client (safe to expose anon key)
+  const SUPABASE_URL = "https://uyjprceryudydlsaaexb.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5anByY2VyeXVkeWRsc2FhZXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0NDk5NTEsImV4cCI6MjA3ODAyNTk1MX0.S10sWdn05bdzaIiLlns8JqcVqeehvJccu8gTMUYkwGI";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+<!-- Dashboard Logic -->
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const ZONES_STORAGE_KEY = "swach_raipur_zones";
+  const DEFAULT_ZONES = [
+    { id: 1, name: "Zone 1" },
+    { id: 2, name: "Zone 2" },
+    { id: 3, name: "Zone 3" },
+    { id: 4, name: "Zone 4" },
+    { id: 5, name: "Zone 5" },
+    { id: 6, name: "Zone 6" }
+  ];
+  let complaintsData = [];
+
+  const loadDashboardZones = () => {
+    try {
+      const saved = localStorage.getItem(ZONES_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : null;
+      return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_ZONES;
+    } catch (error) {
+      console.error("Failed to load saved zones:", error);
+      return DEFAULT_ZONES;
+    }
+  };
+
+  // --- Sidebar + Chart Logic ---
+  const sidebar = document.getElementById('sidebar');
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  const body = document.body;
+
+  const toggleSidebar = () => {
+    if (window.innerWidth < 1024) {
+      const isOpen = sidebar.classList.toggle('-translate-x-full');
+      sidebarBackdrop.classList.toggle('hidden', isOpen);
+      body.classList.toggle('overflow-hidden', !isOpen);
+    }
+  };
+
+  if (hamburgerBtn) hamburgerBtn.addEventListener('click', toggleSidebar);
+  if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', toggleSidebar);
+  
+            const adminLogoutLink = document.getElementById('admin-logout-link');
+            if (adminLogoutLink) {
+                adminLogoutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('driverToken');
+                    localStorage.removeItem('driver');
+                    window.location.href = 'index.html';
+                });
+            }
+    
+sidebar.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth < 1024) toggleSidebar();
+    });
+  });
+
+  // --- Charts ---
+  const ctxComplaints = document.getElementById('complaintsChart').getContext('2d');
+  const complaintsChart = new Chart(ctxComplaints, {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Complaints Resolved',
+        data: [],
+        backgroundColor: 'rgba(40, 167, 69, 0.8)',
+        borderColor: 'rgba(40, 167, 69, 1)',
+        borderWidth: 1,
+        borderRadius: 5,
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+
+  const ctxGarbage = document.getElementById('garbageChart').getContext('2d');
+  new Chart(ctxGarbage, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Garbage Generated (Tons)',
+        data: [550, 580, 610, 590, 650, 680],
+        borderColor: '#dc3545',
+        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+        fill: true,
+        tension: 0.4,
+      }, {
+        label: 'Garbage Disposed (Tons)',
+        data: [520, 540, 580, 560, 620, 640],
+        borderColor: '#17a2b8',
+        backgroundColor: 'rgba(23, 162, 184, 0.1)',
+        fill: true,
+        tension: 0.4,
+      }]
+    },
+    options: { responsive: true }
+  });
+
+  const renderZoneOverview = () => {
+    const dashboardZones = loadDashboardZones();
+    const resolvedByZone = Object.fromEntries(
+      dashboardZones.map(zone => [zone.name, 0])
+    );
+    const zoneCounts = Object.fromEntries(
+      dashboardZones.map(zone => [zone.name, 0])
+    );
+
+    complaintsData.forEach(c => {
+      const zone = c.zone || "Unassigned";
+      if (resolvedByZone[zone] !== undefined && ["verified", "completed", "solved", "closed"].includes(c.status)) {
+        resolvedByZone[zone]++;
+      }
+      if (zoneCounts[zone] !== undefined) {
+        zoneCounts[zone]++;
+      }
+    });
+
+    complaintsChart.data.labels = dashboardZones.map(zone => zone.name);
+    complaintsChart.data.datasets[0].data = dashboardZones.map(zone => resolvedByZone[zone.name] || 0);
+    complaintsChart.update();
+
+    const complaintList = document.getElementById("complaint-list");
+    complaintList.innerHTML = "";
+
+    dashboardZones.forEach((zone, index) => {
+      const colorMap = ["smart-red", "smart-green", "smart-yellow", "smart-blue", "smart-red", "smart-green"];
+      const color = colorMap[index % colorMap.length] || "smart-blue";
+      const count = zoneCounts[zone.name] || 0;
+
+      complaintList.innerHTML += `
+        <a href="admin_complaint_review.html?zone=${encodeURIComponent(zone.name)}" 
+           class="zone-card card bg-white hover:border-${color}">
+          <div class="zone-number-badge text-${color}">${count}</div>
+          <h3 class="zone-name text-smart-dark">${zone.name}</h3>
+        </a>`;
+    });
+  };
+
+// --- Fetch Complaint Counts via backend ---
+try {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "admin_login.html";
+    return;
+  }
+
+  const response = await fetch("https://novomesh-backend.onrender.com/api/admin/complaints", {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch complaints");
+
+  const complaints = await response.json();
+  complaintsData = complaints;
+
+// --------------- UPDATE DASHBOARD COUNTS ---------------
+const total = complaints.length;
+
+// normalize status
+complaints.forEach(c => {
+  if (c.status) c.status = c.status.toLowerCase().trim();
+});
+
+// solved complaints
+const solved = complaints.filter(c =>
+  ["verified","completed","solved","closed"].includes(c.status)
+).length;
+
+// pending complaints
+const pending = complaints.filter(c =>
+  !["verified","completed","solved","closed"].includes(c.status)
+).length;
+const solvedRate = total > 0 ? Math.round((solved / total) * 100) : 0;
+
+document.getElementById("totalCount").textContent = total;
+document.getElementById("solvedCount").textContent = solved;
+document.getElementById("pendingCount").textContent = pending;
+document.getElementById("allTimeMonitoredCount").textContent = total.toLocaleString();
+document.getElementById("allTimeSolvedRate").textContent = `${solvedRate}%`;
+
+try {
+  const driversResponse = await fetch("https://novomesh-backend.onrender.com/api/admin/drivers", {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!driversResponse.ok) throw new Error("Failed to fetch drivers");
+
+  const drivers = await driversResponse.json();
+  const activeCrew = drivers.filter(driver => (driver.status || "").toLowerCase() === "active").length;
+  document.getElementById("activeCrewCount").textContent = activeCrew.toLocaleString();
+} catch (driverError) {
+  console.error("Error fetching drivers:", driverError);
+  document.getElementById("activeCrewCount").textContent = "0";
+}
+
+  renderZoneOverview();
+
+  // --------------- CREATE COMPLAINT CARDS ---------------
+  // Added: Create recent complaint cards with required attributes and classes
+  const container = document.getElementById('complaints-container');
+  container.innerHTML = '';
+const recentComplaints = complaints
+  .filter(c => c.status?.toLowerCase() !== "verified")
+  .slice(0, 6);
+
+recentComplaints.forEach(complaint => {    const card = document.createElement('div');
+    card.className = 'complaint-card card p-4';
+    card.setAttribute('data-id', complaint.id || complaint._id);
+    card.setAttribute('data-zone', complaint.zone || 'Unassigned');
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-2">${complaint.title || 'Complaint'}</h3>
+      <p class="status-text">Status: ${complaint.status || 'Pending'}</p>
+      <div class="flex space-x-2 mt-4">
+        <button class="btn btn-secondary btn-examine">Examine</button>
+        <button class="btn btn-success btn-assign">Assign</button>
+        <button class="btn btn-danger btn-reject">Reject</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // --------------- ADD EVENT LISTENERS FOR COMPLAINT CARDS ---------------
+  // Added: Event delegation for complaint card buttons
+  container.addEventListener('click', async (e) => {
+    const button = e.target;
+    const card = button.closest('.complaint-card');
+    if (!card) return;
+    const complaintId = card.getAttribute('data-id');
+    const token = localStorage.getItem('token');
+
+    if (button.classList.contains('btn-examine')) {
+      // Redirect to complaint review page
+      window.location.href = `admin_complaint_review.html?complaintId=${complaintId}`;
+    } else if (button.classList.contains('btn-assign')) {
+      // Update status to Assigned
+      try {
+        const response = await fetch(`https://novomesh-backend.onrender.com/api/admin/complaints/${complaintId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'Assigned' }),
+        });
+        if (response.ok) {
+          alert('Complaint assigned successfully.');
+          location.reload(); // Refresh to update counts
+        } else {
+          alert('Failed to assign complaint.');
+        }
+      } catch (err) {
+        console.error('Error assigning complaint:', err);
+        alert('Error assigning complaint.');
+      }
+    } else if (button.classList.contains('btn-reject')) {
+      // Confirm and update status to Rejected
+      if (confirm('Are you sure you want to reject this complaint?')) {
+        try {
+          const response = await fetch(`https://novomesh-backend.onrender.com/api/admin/complaints/${complaintId}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: 'Rejected' }),
+          });
+          if (response.ok) {
+            alert('Complaint rejected successfully.');
+            location.reload(); // Refresh to update counts
+          } else {
+            alert('Failed to reject complaint.');
+          }
+        } catch (err) {
+          console.error('Error rejecting complaint:', err);
+          alert('Error rejecting complaint.');
+        }
+      }
+    }
+  });
+
+  renderZoneOverview();
+
+
+window.addEventListener("storage", (event) => {
+  if (event.key === ZONES_STORAGE_KEY) {
+    renderZoneOverview();
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    renderZoneOverview();
+  }
+});
+
+} catch (err) {
+  console.error("Error fetching complaints:", err);
+}
+
+});
+</script>
+<script src="../assets/js/darkmode.js"></script>
+</body>
+</html>

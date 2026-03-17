@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awareness - Clean City Initiative</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Font (Roboto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Configure Tailwind (Same as other pages) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': '#28a745', // Main green
+                        'smart-green-light': '#dcfce7', // Lighter green
+                        'smart-blue': '#17a2b8',  // Admin blue
+                        'smart-yellow': '#ffc107', // Driver yellow
+                        'smart-dark': '#333333',   // Footer/text dark
+                        'smart-gray': '#6c757d',   // Subtext gray
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    height: {
+                        '80px': '80px', // Custom height for desktop header
+                    },
+                    minHeight: {
+                        '60px': '60px', // Custom min-height for mobile header
+                    },
+                    boxShadow: {
+                        'header': '0 2px 6px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.1)',
+                        'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles (Nav hover effect and page header) -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .hero-bg-about {
+            /* Lighter green background for the page header */
+            background-color: #f0fdf4; /* Tailwind green-50 */
+        }
+        
+        /* Custom class for the nav link hover effect */
+        .nav-link {
+            position: relative;
+            text-decoration: none;
+            color: #333333;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            transition: width 0.3s ease-in-out;
+        }
+        .nav-link:hover {
+            color: #28a745;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .nav-link-active {
+            color: #28a745;
+            font-weight: 500;
+        }
+        .nav-link-active::after {
+            width: 100%;
+            background-color: #28a745;
+            height: 2px;
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            content: '';
+        }
+    </style>
+</head>
+<body class="font-roboto text-smart-dark antialiased">
+
+    <!-- Header (Sticky) -->
+    <header class="bg-white shadow-header sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[80px] min-h-[60px]">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center space-x-2">
+                <!-- SVG Logo: Recycle Bin -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                <span class="text-xl font-bold text-smart-green">Clean City</span>
+            </a>
+            
+            <!-- Navigation (Desktop) -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link font-medium">Home</a>
+                <a href="about.html" class="nav-link font-medium">About</a>
+                <a href="awareness.html" class="nav-link nav-link-active">Awareness</a>
+                <a href="blog.html" class="nav-link font-medium">Blog</a>
+                <a href="contact.html" class="nav-link font-medium">Contact</a>
+            </div>
+            
+            <!-- Hamburger Menu (Mobile) -->
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-smart-dark focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu (Collapsible) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <a href="index.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Home</a>
+            <a href="about.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">About</a>
+            <a href="awareness.html" class="block px-6 py-3 text-smart-green font-medium bg-gray-50">Awareness</a>
+            <a href="blog.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Blog</a>
+            <a href="contact.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header Section -->
+        <section class="hero-bg-about py-16">
+            <div class="container mx-auto px-4 text-center">
+                <h1 class="text-4xl font-bold text-smart-dark mb-2">Waste Management Awareness</h1>
+                <p class="text-lg text-smart-gray max-w-2xl mx-auto">Learn how to properly classify, segregate, and dispose of waste to help our city.</p>
+            </div>
+        </section>
+
+        <!-- Introduction Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4 max-w-4xl">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-6">Why Proper Waste Management Matters</h2>
+                <p class="text-lg text-smart-gray text-center">
+                    Proper waste management is critical for environmental sustainability, public health, and a cleaner community. Awareness at the individual level can significantly reduce pollution and improve living conditions. This guide will help you understand the different types of waste and the best practices for handling them.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section: Waste Classification -->
+        <section class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-16">1. Classification of Waste</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Card 1: Biodegradable (Green) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-card border-l-4 border-smart-green flex flex-col">
+                        <!-- Icon + Title -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-smart-green-light text-smart-green rounded-lg flex items-center justify-center">
+                                <!-- Leaf Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22s1.2-1.2 1.7-1.7C5.2 18.8 6 17 6 15a4 4 0 0 1 4-4c0 1.5.8 2.7 2.3 4.2C13.8 16.8 15 18 17 18a4 4 0 0 1 4 4"></path><path d="m14.2 11.8 3.5-3.5a2.1 2.1 0 0 0-3-3l-3.5 3.5"></path><path d="m11.8 14.2 3.5-3.5"></path><path d="m7.5 18.5 3.5-3.5"></path><path d="M14 22s1.2-1.2 1.7-1.7c1.5-1.5 2.3-3.2 2.3-5.3a4 4 0 0 0-4-4c-1.5 0-2.7.8-4.2 2.3C8.2 16.8 7 18 7 20a4 4 0 0 0 4 4"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-smart-dark ml-4">Biodegradable (Organic)</h3>
+                        </div>
+                        <p class="text-smart-gray mb-3">These are wastes that can decompose naturally.</p>
+                        <p class="text-smart-gray font-semibold mb-2">Examples:</p>
+                        <ul class="list-disc list-inside text-smart-gray space-y-1">
+                            <li>Food scraps (vegetable peels, leftovers)</li>
+                            <li>Garden waste (leaves, grass clippings)</li>
+                            <li>Tea bags, coffee grounds</li>
+                        </ul>
+                        <div class="mt-auto pt-4">
+                            <p class="text-smart-green font-semibold bg-smart-green-light p-3 rounded-lg">
+                                Disposal Tip: Use a <span class="font-bold">Green Bag</span>. You can also compost this at home.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Recyclable (Blue) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-card border-l-4 border-smart-blue flex flex-col">
+                         <!-- Icon + Title -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-blue-100 text-smart-blue rounded-lg flex items-center justify-center">
+                                <!-- Recycle Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"></path><path d="m16 6 3-3"></path><path d="M18 13h4"></path><path d="m16 20 3 3"></path><path d="M12 22v-4"></path><path d="m8 20-3 3"></path><path d="M6 13H2"></path><path d="m8 6-3-3"></path><path d="M7 11v1a4 4 0 0 0 4 4h1"></path><path d="m11 18 2-2-2-2"></path><path d="M17 13v-1a4 4 0 0 0-4-4h-1"></path><path d="m13 6-2 2 2 2"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-smart-dark ml-4">Recyclable (Dry)</h3>
+                        </div>
+                        <p class="text-smart-gray mb-3">Items that can be processed to make new products.</p>
+                        <p class="text-smart-gray font-semibold mb-2">Examples:</p>
+                        <ul class="list-disc list-inside text-smart-gray space-y-1">
+                            <li>Paper, cardboard, newspapers</li>
+                            <li>Plastic bottles, containers, packaging</li>
+                            <li>Metal cans, aluminum foil, glass bottles</li>
+                        </ul>
+                        <div class="mt-auto pt-4">
+                            <p class="text-smart-blue font-semibold bg-blue-100 p-3 rounded-lg">
+                                Disposal Tip: Use a <span class="font-bold">Blue Bag</span>. Rinse items before disposal.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Hazardous (Yellow/Red) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-card border-l-4 border-smart-yellow flex flex-col">
+                         <!-- Icon + Title -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-yellow-100 text-smart-yellow rounded-lg flex items-center justify-center">
+                                <!-- Alert Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-smart-dark ml-4">Hazardous Waste</h3>
+                        </div>
+                        <p class="text-smart-gray mb-3">Can harm humans, animals, or the environment.</p>
+                        <p class="text-smart-gray font-semibold mb-2">Examples:</p>
+                        <ul class="list-disc list-inside text-smart-gray space-y-1">
+                            <li>Batteries, fluorescent tubes, thermometers</li>
+                            <li>Paint cans, pesticides, cleaning chemicals</li>
+                            <li>Expired medicines or drugs</li>
+                        </ul>
+                        <div class="mt-auto pt-4">
+                            <p class="text-yellow-800 font-semibold bg-yellow-100 p-3 rounded-lg">
+                                Disposal Tip: Use a <span class="font-bold">Red or Yellow Bag</span>. Hand over to authorized centers.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: E-Waste (Dark) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-card border-l-4 border-smart-dark flex flex-col">
+                         <!-- Icon + Title -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gray-200 text-smart-dark rounded-lg flex items-center justify-center">
+                                <!-- Monitor Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-smart-dark ml-4">E-Waste (Electronic)</h3>
+                        </div>
+                        <p class="text-smart-gray mb-3">Contains toxic materials and needs special handling.</p>
+                        <p class="text-smart-gray font-semibold mb-2">Examples:</p>
+                        <ul class="list-disc list-inside text-smart-gray space-y-1">
+                            <li>Old mobile phones, computers, chargers</li>
+                            <li>Televisions, refrigerators, air conditioners</li>
+                            <li>Printers, old cables</li>
+                        </ul>
+                        <div class="mt-auto pt-4">
+                            <p class="text-smart-dark font-semibold bg-gray-200 p-3 rounded-lg">
+                                Disposal Tip: <span class="font-bold">Never</span> put in regular trash. Drop at authorized e-waste collection points.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section: The 3 R's (Best Practices) -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-16">2. The Golden Rules of Waste Management</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <!-- Reduce -->
+                    <div class="p-6">
+                        <div class="flex justify-center items-center w-24 h-24 bg-red-100 text-red-600 rounded-full mx-auto mb-6 transform hover:scale-110 transition-transform duration-300">
+                             <!-- Minus Circle Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2">Reduce</h3>
+                        <p class="text-smart-gray">Avoid single-use plastics, use cloth bags for shopping, and purchase items with minimal packaging.</p>
+                    </div>
+                    <!-- Reuse -->
+                    <div class="p-6">
+                        <div class="flex justify-center items-center w-24 h-24 bg-blue-100 text-blue-600 rounded-full mx-auto mb-6 transform hover:scale-110 transition-transform duration-300">
+                             <!-- Gift Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"></path><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2">Reuse</h3>
+                        <p class="text-smart-gray">Repurpose containers, jars, and old items for storage or creative projects instead of throwing them away.</p>
+                    </div>
+                    <!-- Recycle -->
+                    <div class="p-6">
+                        <div class="flex justify-center items-center w-24 h-24 bg-smart-green-light text-smart-green rounded-full mx-auto mb-6 transform hover:scale-110 transition-transform duration-300">
+                             <!-- Recycle Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"></path><path d="m16 6 3-3"></path><path d="M18 13h4"></path><path d="m16 20 3 3"></path><path d="M12 22v-4"></path><path d="m8 20-3 3"></path><path d="M6 13H2"></path><path d="m8 6-3-3"></path><path d="M7 11v1a4 4 0 0 0 4 4h1"></path><path d="m11 18 2-2-2-2"></path><path d="M17 13v-1a4 4 0 0 0-4-4h-1"></path><path d="m13 6-2 2 2 2"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2">Recycle</h3>
+                        <p class="text-smart-gray">Ensure that all your dry, recyclable waste (paper, plastic, glass, metal) is clean and goes to the right collection points.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Section -->
+        <section class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-smart-dark mb-8">Learn How to Segregate</h2>
+                <p class="text-lg text-smart-gray max-w-2xl mx-auto mb-12">
+                    Visual guides can make learning easier. Watch this short video to see practical examples of waste segregation at home.
+                </p>
+                <a href="https://www.youtube.com/watch?v=cvE33sCLmOk" target="_blank" class="max-w-3xl mx-auto rounded-2xl shadow-card overflow-hidden aspect-video bg-gray-800 flex items-center justify-center relative group cursor-pointer no-underline">
+                    <img src="https://placehold.co/1280x720/333333/FFFFFF?text=Waste+Segregation+Guide" alt="Video Placeholder" class="w-full h-full object-cover opacity-70 group-hover:opacity-60 transition-opacity">
+                    <div class="absolute text-white transition-transform duration-300 group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                    </div>
+                     <p class="absolute bottom-4 left-4 text-white text-lg font-semibold">Click to play video</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Do's and Don'ts -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-16">3. Best Practices: Do's & Don'ts</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    
+                    <!-- Do's -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card border-t-4 border-smart-green">
+                        <h3 class="text-2xl font-semibold text-smart-green mb-6 text-center">What To Do</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-smart-green flex-shrink-0 mt-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Segregate at Source:</span> Always keep wet, dry, and hazardous waste in separate bins/bags.</p>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-smart-green flex-shrink-0 mt-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Dispose Daily:</span> Dispose of waste, especially wet waste, regularly to prevent odor and pests.</p>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-smart-green flex-shrink-0 mt-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Report Issues:</span> Use the <a href="citizen_login.html" class="text-smart-blue font-semibold hover:underline">Citizen Portal</a> to report overfilled bins or illegal dumping.</p>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-smart-green flex-shrink-0 mt-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Educate Others:</span> Participate in clean-up drives and educate neighbors about proper segregation.</p>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Don'ts -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card border-t-4 border-red-500">
+                        <h3 class="text-2xl font-semibold text-red-500 mb-6 text-center">What Not To Do</h3>
+                         <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-red-500 flex-shrink-0 mt-1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Don't Mix Waste:</span> Never mix biodegradable waste with plastics, e-waste, or hazardous items.</p>
+                            </li>
+                             <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-red-500 flex-shrink-0 mt-1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Don't Overfill:</span> Avoid overfilling bags. Tie them tightly before disposal to prevent spillage.</p>
+                            </li>
+                             <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-red-500 flex-shrink-0 mt-1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Don't Dump Illegally:</span> Never throw garbage in open plots, drains, or on roadsides.</p>
+                            </li>
+                             <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-red-500 flex-shrink-0 mt-1"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <p class="text-smart-gray"><span class="font-semibold text-smart-dark">Don't Throw E-Waste:</span> Never dispose of batteries, bulbs, or electronics in regular bins.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Benefits -->
+        <section class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-16">The Benefits of Our Collective Effort</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Benefit 1 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-card text-center transform hover:-translate-y-2 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 text-smart-blue mx-auto mb-4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <h4 class="text-xl font-semibold text-smart-dark mb-2">Reduces Pollution</h4>
+                        <p class="text-smart-gray text-sm">Prevents air, water, and soil contamination by handling waste correctly.</p>
+                    </div>
+                    <!-- Benefit 2 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-card text-center transform hover:-translate-y-2 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 text-smart-green mx-auto mb-4"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        <h4 class="text-xl font-semibold text-smart-dark mb-2">Prevents Diseases</h4>
+                        <p class="text-smart-gray text-sm">Proper disposal stops the spread of diseases carried by pests and bacteria.</p>
+                    </div>
+                    <!-- Benefit 3 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-card text-center transform hover:-translate-y-2 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 text-smart-yellow mx-auto mb-4"><path d="M11 15h2a2 2 0 1 0 0-4h-2a2 2 0 1 1 0-4h2"></path><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M4.93 19.07l1.41-1.41"></path><path d="M17.66 6.34l1.41-1.41"></path></g></svg>
+                        <h4 class="text-xl font-semibold text-smart-dark mb-2">Conserves Resources</h4>
+                        <p class="text-smart-gray text-sm">Recycling paper, plastic, and metal saves natural resources and energy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Section -->
+        <section class="bg-smart-green text-white">
+            <div class="container mx-auto px-4 py-16 text-center">
+                <h2 class="text-3xl font-bold mb-4">Be Part of the Solution</h2>
+                <p class="text-lg text-green-100 mb-8 max-w-xl mx-auto">Now that you know the basics, help us keep the city clean. Report issues or contact us for more information.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="citizen_login.html" class="bg-white text-smart-green font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition-colors duration-300 transform hover:scale-105">
+                        Report an Issue
+                    </a>
+                    <a href="contact.html" class="bg-smart-green-light text-smart-green font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-green-100 transition-colors duration-300 transform hover:scale-105 border border-green-200">
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact-footer" class="bg-smart-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
+                <!-- Left Column: Logo + Tagline -->
+                <div>
+                    <a href="index.html" class="flex items-center justify-center md:justify-start space-x-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                           <path d="M3 6h18"></path>
+                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <span class="text-xl font-bold text-white">Clean City</span>
+                    </a>
+                    <p class="text-sm text-gray-400">A cleaner, smarter future for our city.</p>
+                </div>
+                
+                <!-- Center Column: Quick Links -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-smart-green transition-colors">Home</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-smart-green transition-colors">About Us</a></li>
+                        <li><a href="awareness.html" class="text-gray-300 hover:text-smart-green transition-colors">Awareness</a></li>
+                         <li><a href="blog.html" class="text-gray-300 hover:text-smart-green transition-colors">Blog</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-smart-green transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Right Column: Social Media -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Follow Us</h4>
+                    <div class="flex justify-center md:justify-start space-x-5">
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Twitter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-700 mt-10 pt-6 text-center text-sm text-gray-500">
+                <p>&copy; 2025 Clean City Initiative. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Micro-interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>

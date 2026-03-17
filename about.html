@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Clean City Initiative</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Font (Roboto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Note: Chart.js is not needed on this page, but we keep the config for consistency -->
+    
+    <!-- Configure Tailwind (Inspired by your example) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': '#28a745', // Main green
+                        'smart-green-light': '#dcfce7', // Lighter green
+                        'smart-blue': '#17a2b8',  // Admin blue
+                        'smart-yellow': '#ffc107', // Driver yellow
+                        'smart-dark': '#333333',   // Footer/text dark
+                        'smart-gray': '#6c757d',   // Subtext gray
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    height: {
+                        '80px': '80px', // Custom height for desktop header
+                    },
+                    minHeight: {
+                        '60px': '60px', // Custom min-height for mobile header
+                    },
+                    boxShadow: {
+                        'header': '0 2px 6px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.1)',
+                        'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles (Nav hover effect from your example) -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .hero-bg-about {
+            /* Lighter green background for the About page header */
+            background-color: #f0fdf4; /* Tailwind green-50 */
+        }
+        
+        /* Custom class for the nav link hover effect */
+        .nav-link {
+            position: relative;
+            text-decoration: none;
+            color: #333333;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            transition: width 0.3s ease-in-out;
+        }
+        .nav-link:hover {
+            color: #28a745;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .nav-link-active {
+            color: #28a745;
+            font-weight: 500;
+        }
+        .nav-link-active::after {
+            width: 100%;
+            background-color: #28a745;
+            height: 2px;
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            content: '';
+        }
+    </style>
+</head>
+<body class="font-roboto text-smart-dark antialiased">
+
+    <!-- Header (Sticky) -->
+    <header class="bg-white shadow-header sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[80px] min-h-[60px]">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center space-x-2">
+                <!-- SVG Logo: Recycle Bin -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                <span class="text-xl font-bold text-smart-green">Clean City</span>
+            </a>
+            
+            <!-- Navigation (Desktop) -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link font-medium">Home</a>
+                <a href="about.html" class="nav-link nav-link-active">About</a>
+                <a href="awareness.html" class="nav-link font-medium">Awareness</a>
+                <a href="blog.html" class="nav-link font-medium">Blog</a>
+                <a href="contact.html" class="nav-link font-medium">Contact</a>
+            </div>
+            
+            <!-- Hamburger Menu (Mobile) -->
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-smart-dark focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu (Collapsible) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <a href="index.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Home</a>
+            <a href="about.html" class="block px-6 py-3 text-smart-green font-medium bg-gray-50">About</a>
+            <a href="awareness.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Awareness</a>
+            <a href="blog.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Blog</a>
+            <a href="contact.html" class="block px-6 py-3 text-smart-dark hover:bg-gray-50">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Page Header Section -->
+        <section class="hero-bg-about py-16">
+            <div class="container mx-auto px-4 text-center">
+                <h1 class="text-4xl font-bold text-smart-dark mb-2">About Our Initiative</h1>
+                <p class="text-lg text-smart-gray max-w-2xl mx-auto">Connecting our community, technology, and city services to build a cleaner, smarter future for everyone.</p>
+            </div>
+        </section>
+
+        <!-- Platform Overview Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <span class="text-smart-green font-semibold">WHAT WE DO</span>
+                        <h2 class="text-3xl font-bold text-smart-dark mt-2 mb-4">A New Approach to Urban Cleanliness</h2>
+                        <p class="text-smart-gray mb-4">
+                            The Clean City platform is a software-driven solution designed to revolutionize how our municipality handles waste management. We bridge the gap between citizens, collection crews, and city administration using smart technology.
+                        </p>
+                        <p class="text-smart-gray">
+                            Instead of relying on expensive hardware or sensors, we empower citizens to be the "eyes" of the city. Through our easy-to-use portal, anyone can report an overflowing bin or a civic issue. Our AI backend then verifies the report, notifies the nearest driver, and optimizes their route, ensuring a fast and efficient response.
+                        </p>
+                    </div>
+                    <div>
+                        <img src="https://placehold.co/600x400/28a745/FFFFFF?text=AI+Verification+Demo" alt="AI Verification Graphic" class="rounded-2xl shadow-card w-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section (Re-used from index.html for consistency) -->
+        <section id="how-it-works" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-4">How Our Platform Works</h2>
+                <p class="text-lg text-smart-gray text-center max-w-2xl mx-auto mb-16">A simple 3-step process for a cleaner city, powered by citizens and AI.</p>
+                
+                <div class="flex flex-col lg:flex-row justify-between items-center space-y-12 lg:space-y-0">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center text-center max-w-xs relative">
+                        <div class="bg-smart-green-light text-smart-green rounded-full p-6 mb-4 transform hover:scale-110 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path><path d="M15 5l4 4"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">1. Complaint Submission</h3>
+                        <p class="text-smart-gray">Citizens spot a full bin, snap a photo, and upload it through our simple portal.</p>
+                    </div>
+                    
+                    <!-- Arrow 1 (Desktop) -->
+                    <div class="hidden lg:block text-smart-green opacity-30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center text-center max-w-xs relative">
+                        <div class="bg-smart-green-light text-smart-green rounded-full p-6 mb-4 transform hover:scale-110 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-4"></path><path d="M12 14V4"></path><path d="M4 14h16"></path><path d="M18 18h-4v-4h4Z"></path><path d="M10 18H6v-4h4Z"></path><path d="M10 8H6V4h4Z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">2. AI Verification</h3>
+                        <p class="text-smart-gray">Our AI instantly analyzes the image to verify the complaint is genuine.</p>
+                    </div>
+                    
+                    <!-- Arrow 2 (Desktop) -->
+                    <div class="hidden lg:block text-smart-green opacity-30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center text-center max-w-xs">
+                        <div class="bg-smart-green-light text-smart-green rounded-full p-6 mb-4 transform hover:scale-110 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">3. Collection & Update</h3>
+                        <p class="text-smart-gray">The nearest driver is dispatched, and the status is updated in real-time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Gallery Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-16">Platform in Action</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <img src="https://placehold.co/600x400/28a745/FFFFFF?text=Citizen+Portal" alt="Citizen Portal Screenshot" class="rounded-lg shadow-card object-cover w-full h-64 transform hover:scale-105 transition-transform duration-300">
+                    <img src="https://placehold.co/600x400/17a2b8/FFFFFF?text=Admin+Dashboard" alt="Admin Dashboard Screenshot" class="rounded-lg shadow-card object-cover w-full h-64 transform hover:scale-105 transition-transform duration-300">
+                    <img src="https://placehold.co/600x400/ffc107/FFFFFF?text=Driver+App" alt="Driver App Screenshot" class="rounded-lg shadow-card object-cover w-full h-64 transform hover:scale-105 transition-transform duration-300">
+                    <img src="https://placehold.co/600x400/6c757d/FFFFFF?text=Before+Cleanup" alt="Before Cleanup" class="rounded-lg shadow-card object-cover w-full h-64 transform hover:scale-105 transition-transform duration-300">
+                    <img src="https://placehold.co/600x400/28a745/FFFFFF?text=After+Cleanup" alt="After Cleanup" class="rounded-lg shadow-card object-cover w-full h-64 transform hover:scale-105 transition-transform duration-300">
+                    <img src="https://placehold.co/600x400/17a2b8/FFFFFF?text=Route+Optimization" alt="Route Optimization Screenshot" class="rounded-lg shadow-card object-cover w-full h-64 transform hover:scale-105 transition-transform duration-300">
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-16">Meet the Team Members</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <!-- Team Member 1 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card text-center transition-all duration-300 hover:shadow-card-hover">
+                        <img class="w-24 h-24 rounded-full mx-auto mb-4 object-cover" src="https://placehold.co/100x100/EAF7E8/28a745?text=R" alt="Team Member 1 Avatar">
+                        <h3 class="text-xl font-semibold text-smart-dark">Raj</h3>
+                        <p class="text-smart-green font-medium">Project Leader</p>
+                    </div>
+                    <!-- Team Member 2 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card text-center transition-all duration-300 hover:shadow-card-hover">
+                        <img class="w-24 h-24 rounded-full mx-auto mb-4 object-cover" src="https://placehold.co/100x100/FFF8E1/ffc107?text=A" alt="Team Member 3 Avatar">
+                        <h3 class="text-xl font-semibold text-smart-dark">Ananya</h3>
+                        <p class="text-smart-yellow font-medium">penetration tester</p>
+                    </div>
+                    <!-- Team Member 3 -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card text-center transition-all duration-300 hover:shadow-card-hover">
+                        <img class="w-24 h-24 rounded-full mx-auto mb-4 object-cover" src="https://placehold.co/100x100/E3F8FA/17a2b8?text=B" alt="Team Member 2 Avatar">
+                        <h3 class="text-xl font-semibold text-smart-dark">Bihari</h3>
+                        <p class="text-smart-blue font-medium">Project Developer</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map & Contact Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-smart-dark mb-16">Find Us & Get in Touch</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <!-- Column 1: Map -->
+                    <div class="bg-white p-4 rounded-2xl shadow-card h-[500px]">
+                        <iframe src="map.html" class="w-full h-full border-0 rounded-lg" title="Interactive Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <!-- Column 2: Contact Info -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card">
+                        <h3 class="text-2xl font-semibold text-smart-dark mb-6">Contact Information</h3>
+                        <div class="space-y-6">
+                            <!-- Address -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-smart-green-light text-smart-green rounded-lg flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-lg text-smart-dark">Office Address</h4>
+                                    <p class="text-smart-gray">123 Green Way, Innovation Hub,<br>Raipur, Chhattisgarh - 492001</p>
+                                </div>
+                            </div>
+                            <!-- Phone -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-smart-green-light text-smart-green rounded-lg flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-lg text-smart-dark">Phone</h4>
+                                    <p class="text-smart-gray">(+91) 987-654-3210</p>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-12 h-12 bg-smart-green-light text-smart-green rounded-lg flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-lg text-smart-dark">Email</h4>
+                                    <p class="text-smart-gray">contact@cleancity.gov.in</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials / Social Proof (Re-used from index.html) -->
+        <section id="testimonials" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-16">What People Are Saying</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Testimonial 1: Citizen -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card border-l-4 border-smart-green">
+                        <p class="text-smart-gray italic mb-6">"Reporting full bins has never been easier. The AI verification is spot-on and I got a notification as soon as it was cleaned!"</p>
+                        <div class="flex items-center">
+                            <img class="w-12 h-12 rounded-full mr-4 object-cover" src="https://placehold.co/100x100/EAF7E8/28a745?text=A" alt="Citizen Avatar">
+                            <div>
+                                <p class="font-semibold text-smart-dark">Ananya S.</p>
+                                <p class="text-sm text-smart-gray">Local Citizen, Sector 12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Testimonial 2: Driver -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card border-l-4 border-smart-yellow">
+                        <p class="text-smart-gray italic mb-6">"The optimized routes save me hours every day. I can cover more bins with less fuel. The app is simple to use."</p>
+                        <div class="flex items-center">
+                            <img class="w-12 h-12 rounded-full mr-4 object-cover" src="https://placehold.co/100x100/FFF8E1/ffc107?text=R" alt="Driver Avatar">
+                            <div>
+                                <p class="font-semibold text-smart-dark">Ramesh P.</p>
+                                <p class="text-sm text-smart-gray">Collection Driver, Zone 3</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Testimonial 3: Admin -->
+                    <div class="bg-white p-8 rounded-2xl shadow-card border-l-4 border-smart-blue">
+                        <p class="text-smart-gray italic mb-6">"We can now monitor the entire city's waste in real-time. The AI alerts help us dispatch teams proactively. It's a game-changer."</p>
+                        <div class="flex items-center">
+                            <img class="w-12 h-12 rounded-full mr-4 object-cover" src="https://placehold.co/100x100/E3F8FA/17a2b8?text=V" alt="Admin Avatar">
+                            <div>
+                                <p class="font-semibold text-smart-dark">V. K. Sharma</p>
+                                <p class="text-sm text-smart-gray">Municipal Officer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Section -->
+        <section class="bg-smart-green text-white">
+            <div class="container mx-auto px-4 py-16 text-center">
+                <h2 class="text-3xl font-bold mb-4">Join Us in Making Our City Cleaner</h2>
+                <p class="text-lg text-green-100 mb-8 max-w-xl mx-auto">Report an issue today or learn more about how you can contribute to a sustainable future.</p>
+                <a href="citizen_login.html" class="bg-white text-smart-green font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition-colors duration-300 transform hover:scale-105">
+                    Get Started Now
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact-footer" class="bg-smart-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
+                <!-- Left Column: Logo + Tagline -->
+                <div>
+                    <a href="index.html" class="flex items-center justify-center md:justify-start space-x-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                           <path d="M3 6h18"></path>
+                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <span class="text-xl font-bold text-white">Clean City</span>
+                    </a>
+                    <p class="text-sm text-gray-400">A cleaner, smarter future for our city.</p>
+                </div>
+                
+                <!-- Center Column: Quick Links -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-smart-green transition-colors">Home</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-smart-green transition-colors">About Us</a></li>
+                        <li><a href="awareness.html" class="text-gray-300 hover:text-smart-green transition-colors">Awareness</a></li>
+                         <li><a href="blog.html" class="text-gray-300 hover:text-smart-green transition-colors">Blog</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-smart-green transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Right Column: Social Media -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Follow Us</h4>
+                    <div class="flex justify-center md:justify-start space-x-5">
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="Twitter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-smart-green transition-colors" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-700 mt-10 pt-6 text-center text-sm text-gray-500">
+                <p>&copy; 2025 Clean City Initiative. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Micro-interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>

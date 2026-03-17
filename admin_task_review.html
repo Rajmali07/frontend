@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Review - Swach Raipur Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "smart-green": "#28a745",
+                        "smart-blue": "#17a2b8",
+                        "smart-yellow": "#ffc107",
+                        "smart-red": "#dc3545",
+                        "smart-gray": "#6c757d",
+                        "smart-dark": "#333333"
+                    },
+                    fontFamily: {
+                        roboto: ["Roboto", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: "Roboto", sans-serif; }
+        .sidebar { width: 280px; }
+        .tab-active { border-color: #ffc107; color: #ffc107; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-roboto antialiased flex min-h-screen">
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 bottom-0 z-50 bg-green-700 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+        <div class="p-6 flex items-center gap-3 border-b border-green-800">
+            <img src="assets/logo/swachchh_raipur.svg" alt="Swach Raipur Logo" class="h-10 w-auto rounded-lg">
+            <div>
+                <h1 class="text-xl font-bold leading-tight">Swach Raipur</h1>
+                <p class="text-sm text-green-100">Admin Panel</p>
+            </div>
+        </div>
+
+        <nav class="flex-grow space-y-2 p-4 pt-6">
+            <a href="admin_dashboard.html" class="block p-3 rounded-lg hover:bg-green-800">Dashboard</a>
+            <a href="zones.html" class="block p-3 rounded-lg hover:bg-green-800">Zones</a>
+            <a href="admin_task_review.html" class="block p-3 rounded-lg bg-green-800 font-bold">Task Review</a>
+            <a href="admin_user_management.html" class="block p-3 rounded-lg hover:bg-green-800">Driver Management</a>
+            <a href="admin_feedback.html" class="block p-3 rounded-lg hover:bg-green-800">Feedback</a>
+            <a href="admin_blogs.html" class="block p-3 rounded-lg hover:bg-green-800">Blog</a>
+            <a href="analytics.html" class="block p-3 rounded-lg hover:bg-green-800">Analytics</a>
+            <a href="profile.html" class="block p-3 rounded-lg hover:bg-green-800">Profile</a>
+            <a href="admin_settings.html" class="block p-3 rounded-lg hover:bg-green-800">Settings</a>
+        </nav>
+
+        <div class="p-6 border-t border-green-800">
+            <a href="index.html" id="admin-logout-link" class="flex items-center justify-center gap-2 p-3 rounded-lg text-yellow-300 font-semibold hover:text-yellow-200">LOGOUT</a>
+        </div>
+    </aside>
+
+    <header class="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-slate-800 border-b border-slate-700">
+        <div class="h-full px-4 flex items-center justify-between">
+            <a href="admin_dashboard.html" class="flex items-center gap-2">
+                <img src="assets/logo/swachchh_raipur.svg" alt="Logo" class="h-10 w-auto">
+                <span class="text-lg font-bold">Task Review</span>
+            </a>
+            <button id="hamburger-btn" class="p-2 rounded-md border border-slate-600">Menu</button>
+        </div>
+    </header>
+
+    <main class="lg:ml-[280px] flex-grow px-4 sm:px-6 lg:px-8 pt-20 lg:pt-8 pb-12">
+        <section class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3">
+            <div>
+                <h1 class="text-4xl font-black text-white">Driver Task Management <span id="zone-display" class="text-cyan-400"></span></h1>
+                <p class="text-slate-400">Live verification, ongoing tasks, and history from Supabase.</p>
+            </div>
+            <a href="admin_dashboard.html" class="text-sm text-slate-400 hover:text-white">&larr; Back to Dashboard</a>
+        </section>
+
+        <div class="flex gap-5 border-b border-slate-700 mb-6">
+            <button id="tab-verify" class="tab-button tab-active font-semibold text-xl pb-3 border-b-2 border-transparent" data-tab="verify">Verification Queue <span id="count-verify">(0)</span></button>
+            <button id="tab-ongoing" class="tab-button font-semibold text-xl pb-3 border-b-2 border-transparent text-slate-400" data-tab="ongoing">Ongoing Tasks <span id="count-ongoing">(0)</span></button>
+            <button id="tab-history" class="tab-button font-semibold text-xl pb-3 border-b-2 border-transparent text-slate-400" data-tab="history">Task History</button>
+        </div>
+
+        <section id="content-verify" class="tab-content space-y-4"></section>
+        <section id="content-ongoing" class="tab-content hidden">
+            <div id="ongoing-list" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+        </section>
+        <section id="content-history" class="tab-content hidden">
+            <div class="overflow-x-auto rounded-xl border border-slate-700 bg-slate-800/50">
+                <table class="min-w-full">
+                    <thead class="bg-slate-800">
+                        <tr class="text-left text-xs uppercase tracking-wider text-slate-400">
+                            <th class="px-4 py-3">ID</th>
+                            <th class="px-4 py-3">Location</th>
+                            <th class="px-4 py-3">Driver</th>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body" class="divide-y divide-slate-700"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="verification-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[1000]">
+        <div class="bg-white text-slate-900 w-full max-w-5xl rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b pb-3 mb-5">
+                <h2 class="text-2xl font-bold">Verification <span id="modal-task-id"></span></h2>
+                <button class="close-modal text-3xl leading-none">&times;</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-bold text-smart-red mb-2">Before</h3>
+                    <img id="modal-before-img" src="" alt="Before" class="w-full h-72 object-cover rounded-xl border">
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-smart-green mb-2">After</h3>
+                    <img id="modal-after-img" src="" alt="After" class="w-full h-72 object-cover rounded-xl border">
+                    <p id="modal-after-text" class="mt-2 text-sm text-slate-500"></p>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="reject-trigger-btn" class="bg-smart-red text-white font-bold py-3 px-5 rounded-lg">Reject & Query</button>
+                <button id="approve-btn" class="bg-smart-green text-white font-bold py-3 px-5 rounded-lg">Approve & Resolve</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reject-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[1001]">
+        <div class="bg-white text-slate-900 w-full max-w-xl rounded-2xl p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-3 mb-5">
+                <h2 class="text-2xl font-bold text-smart-red">Reject Verification</h2>
+                <button class="close-reject-modal text-3xl leading-none">&times;</button>
+            </div>
+            <textarea id="reject-comment" rows="4" class="w-full border rounded-lg p-3" placeholder="Reason for rejection..."></textarea>
+            <div class="mt-5 flex justify-end gap-3">
+                <button class="close-reject-modal bg-slate-200 py-2 px-4 rounded-lg">Cancel</button>
+                <button id="confirm-reject-btn" class="bg-smart-red text-white py-2 px-4 rounded-lg disabled:opacity-50" disabled>Confirm Rejection</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="abandon-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[1002]">
+        <div class="bg-white text-slate-900 w-full max-w-xl rounded-2xl p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-3 mb-5">
+                <h2 class="text-2xl font-bold text-smart-red">Abandon Task</h2>
+                <button class="close-abandon-modal text-3xl leading-none">&times;</button>
+            </div>
+            <p>Are you sure you want to abandon <span id="abandon-task-id" class="font-bold text-smart-red"></span>?</p>
+            <div class="mt-5 flex justify-end gap-3">
+                <button class="close-abandon-modal bg-slate-200 py-2 px-4 rounded-lg">Cancel</button>
+                <button id="confirm-abandon-btn" class="bg-smart-red text-white py-2 px-4 rounded-lg">Yes, Abandon</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="contact-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[1003]">
+        <div class="bg-white text-slate-900 w-full max-w-xl rounded-2xl p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-3 mb-5">
+                <h2 class="text-2xl font-bold text-smart-blue">Contact Driver <span id="contact-driver-id"></span></h2>
+                <button class="close-contact-modal text-3xl leading-none">&times;</button>
+            </div>
+            <p class="mb-3">Task: <span id="contact-task-id" class="font-bold"></span></p>
+            <div class="flex items-center justify-between border rounded-lg p-3 mb-4">
+                <span>Phone: <span id="contact-phone" class="font-semibold text-smart-blue"></span></span>
+                <a id="call-driver-btn" href="#" class="bg-smart-green text-white py-2 px-3 rounded-lg">Call Now</a>
+            </div>
+            <textarea id="contact-message" rows="3" class="w-full border rounded-lg p-3" placeholder="Type your message to the driver..."></textarea>
+            <div class="mt-5 flex justify-end">
+                <button id="send-message-btn" class="bg-smart-blue text-white py-2 px-4 rounded-lg">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "admin_login.html";
+                return;
+            }
+
+            const sidebar = document.getElementById("sidebar");
+            const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+            const hamburgerBtn = document.getElementById("hamburger-btn");
+            const body = document.body;
+            const urlParams = new URLSearchParams(window.location.search);
+            const zoneFilter = urlParams.get("zone");
+            const zoneDisplay = document.getElementById("zone-display");
+            zoneDisplay.textContent = zoneFilter ? `(${zoneFilter})` : "";
+
+            const verificationList = document.getElementById("content-verify");
+            const ongoingList = document.getElementById("ongoing-list");
+            const historyTableBody = document.getElementById("history-table-body");
+            const countVerify = document.getElementById("count-verify");
+            const countOngoing = document.getElementById("count-ongoing");
+            const verificationModal = document.getElementById("verification-modal");
+            const rejectModal = document.getElementById("reject-modal");
+            const abandonModal = document.getElementById("abandon-modal");
+            const contactModal = document.getElementById("contact-modal");
+
+            let complaints = [];
+            let driverMap = new Map();
+            let activeVerificationTask = null;
+            let activeOngoingTask = null;
+
+            const statusLower = (value) => String(value || "").trim().toLowerCase();
+            const escapeHtml = (value) => String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+            const formatDate = (value) => {
+                if (!value) return "N/A";
+                const date = new Date(value);
+                return Number.isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                });
+            };
+            const formatStatus = (value) => {
+                const normalized = statusLower(value);
+                return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : "Unknown";
+            };
+            const getDriver = (task) => {
+                const driver = driverMap.get(task.assigned_driver);
+                return {
+                    name: driver ? driver.username : (task.assigned_driver || "Not assigned"),
+                    phone: driver ? (driver.phone || "N/A") : "N/A",
+                    vehicle: driver ? (driver.vehicle || "N/A") : "N/A"
+                };
+            };
+
+            function toggleSidebar() {
+                if (window.innerWidth < 1024) {
+                    const isOpen = sidebar.classList.toggle("-translate-x-full");
+                    sidebarBackdrop.classList.toggle("hidden", isOpen);
+                    body.classList.toggle("overflow-hidden", !isOpen);
+                }
+            }
+
+            function closeAllModals() {
+                [verificationModal, rejectModal, abandonModal, contactModal].forEach((modal) => {
+                    modal.classList.add("hidden");
+                    modal.classList.remove("flex");
+                });
+                body.style.overflow = "";
+            }
+
+            function openModal(modal) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                body.style.overflow = "hidden";
+            }
+
+            function visibleComplaints() {
+                return zoneFilter ? complaints.filter((item) => item.zone === zoneFilter) : complaints;
+            }
+
+            function renderVerification(tasks) {
+                countVerify.textContent = `(${tasks.length})`;
+                if (!tasks.length) {
+                    verificationList.innerHTML = `<p class="text-slate-400">No tasks waiting for verification.</p>`;
+                    return;
+                }
+
+                verificationList.innerHTML = tasks.map((task) => {
+                    const driver = getDriver(task);
+                    return `
+                        <div class="bg-slate-800 rounded-2xl p-6 border-l-4 border-smart-yellow flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <div class="text-2xl font-bold">#${escapeHtml(task.complaint_id)}: ${escapeHtml(task.issue_type)}</div>
+                                <div class="text-slate-400">Driver: ${escapeHtml(driver.name)}</div>
+                                <div class="text-slate-400">Location: ${escapeHtml(task.location || "N/A")}</div>
+                            </div>
+                            <button class="review-btn bg-smart-yellow text-white font-bold py-3 px-5 rounded-lg" data-id="${escapeHtml(task.complaint_id)}">Review & Verify</button>
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            function renderOngoing(tasks) {
+                countOngoing.textContent = `(${tasks.length})`;
+                if (!tasks.length) {
+                    ongoingList.innerHTML = `<p class="text-slate-400 col-span-full">No ongoing tasks right now.</p>`;
+                    return;
+                }
+
+                ongoingList.innerHTML = tasks.map((task) => {
+                    const driver = getDriver(task);
+                    return `
+                        <div class="bg-slate-800 rounded-2xl p-6 border-l-4 border-smart-blue flex flex-col justify-between">
+                            <div>
+                                <div class="text-xl font-bold">#${escapeHtml(task.complaint_id)}: ${escapeHtml(task.issue_type)}</div>
+                                <div class="text-slate-400">Driver: ${escapeHtml(driver.name)}</div>
+                                <div class="text-slate-400">Location: ${escapeHtml(task.location || "N/A")}</div>
+                                <div class="text-slate-400">Updated: ${formatDate(task.updated_at || task.created_at)}</div>
+                            </div>
+                            <div class="flex gap-3 mt-4">
+                                <button class="contact-driver-trigger bg-smart-blue text-white py-2 px-4 rounded-lg flex-1" data-id="${escapeHtml(task.complaint_id)}">Contact Driver</button>
+                                <button class="abandon-task-trigger bg-slate-500 text-white py-2 px-4 rounded-lg flex-1" data-id="${escapeHtml(task.complaint_id)}">Abandon Task</button>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            function renderHistory(tasks) {
+                if (!tasks.length) {
+                    historyTableBody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">No task history available yet.</td></tr>`;
+                    return;
+                }
+
+                historyTableBody.innerHTML = tasks.map((task) => {
+                    const driver = getDriver(task);
+                    const status = formatStatus(task.status);
+                    const statusClass = statusLower(task.status) === "verified" ? "text-green-400" : "text-red-400";
+                    return `
+                        <tr class="hover:bg-slate-800/60">
+                            <td class="px-4 py-4 font-medium">${escapeHtml(task.complaint_id)}</td>
+                            <td class="px-4 py-4">${escapeHtml(task.location || "N/A")}</td>
+                            <td class="px-4 py-4">${escapeHtml(driver.name)}</td>
+                            <td class="px-4 py-4 ${statusClass}">${escapeHtml(status)}</td>
+                            <td class="px-4 py-4">${formatDate(task.updated_at || task.created_at)}</td>
+                        </tr>
+                    `;
+                }).join("");
+            }
+
+            async function loadData() {
+                const headers = { Authorization: `Bearer ${token}` };
+                const [complaintsRes, driversRes] = await Promise.all([
+                    fetch("https://novomesh-backend.onrender.com/api/admin/complaints", { headers }),
+                    fetch("https://novomesh-backend.onrender.com/api/admin/drivers", { headers })
+                ]);
+
+                if (!complaintsRes.ok || !driversRes.ok) {
+                    throw new Error("Failed to fetch task review data");
+                }
+
+                complaints = await complaintsRes.json();
+                const drivers = await driversRes.json();
+                driverMap = new Map(drivers.map((driver) => [driver.id, driver]));
+
+                const items = visibleComplaints();
+                renderVerification(items.filter((task) => statusLower(task.status) === "completed" && task.driver_photo_url));
+                renderOngoing(items.filter((task) => ["assigned", "ongoing", "in progress"].includes(statusLower(task.status))));
+                renderHistory(items.filter((task) => ["verified", "abandoned", "rejected"].includes(statusLower(task.status))));
+            }
+
+            async function updateComplaint(url, payload) {
+                const response = await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload || {})
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.error || data.message || "Request failed");
+                }
+            }
+
+            document.querySelectorAll(".tab-button").forEach((button) => {
+                button.addEventListener("click", () => {
+                    document.querySelectorAll(".tab-button").forEach((item) => {
+                        item.classList.remove("tab-active");
+                        item.classList.add("text-slate-400");
+                    });
+                    document.querySelectorAll(".tab-content").forEach((content) => content.classList.add("hidden"));
+                    button.classList.add("tab-active");
+                    button.classList.remove("text-slate-400");
+                    document.getElementById(`content-${button.dataset.tab}`).classList.remove("hidden");
+                });
+            });
+
+            hamburgerBtn?.addEventListener("click", toggleSidebar);
+            sidebarBackdrop?.addEventListener("click", toggleSidebar);
+            sidebar.querySelectorAll("a").forEach((link) => {
+                link.addEventListener("click", () => {
+                    if (window.innerWidth < 1024) toggleSidebar();
+                });
+            });
+
+            document.getElementById("admin-logout-link").addEventListener("click", (event) => {
+                event.preventDefault();
+                localStorage.removeItem("token");
+                localStorage.removeItem("adminToken");
+                localStorage.removeItem("driverToken");
+                localStorage.removeItem("driver");
+                window.location.href = "index.html";
+            });
+
+            verificationList.addEventListener("click", (event) => {
+                const button = event.target.closest(".review-btn");
+                if (!button) return;
+                const task = complaints.find((item) => item.complaint_id === button.dataset.id);
+                if (!task) return;
+                activeVerificationTask = task;
+                const driver = getDriver(task);
+                document.getElementById("modal-task-id").textContent = `#${task.complaint_id}`;
+                document.getElementById("modal-before-img").src = task.photo_url || "https://placehold.co/600x400/e5e7eb/64748b?text=No+Before+Image";
+                document.getElementById("modal-after-img").src = task.driver_photo_url || "https://placehold.co/600x400/e5e7eb/64748b?text=No+After+Image";
+                document.getElementById("modal-after-text").textContent = `Submitted by ${driver.name} (${driver.vehicle})`;
+                openModal(verificationModal);
+            });
+
+            ongoingList.addEventListener("click", (event) => {
+                const contactButton = event.target.closest(".contact-driver-trigger");
+                if (contactButton) {
+                    const task = complaints.find((item) => item.complaint_id === contactButton.dataset.id);
+                    if (!task) return;
+                    activeOngoingTask = task;
+                    const driver = getDriver(task);
+                    document.getElementById("contact-driver-id").textContent = driver.name;
+                    document.getElementById("contact-task-id").textContent = `#${task.complaint_id}`;
+                    document.getElementById("contact-phone").textContent = driver.phone;
+                    document.getElementById("call-driver-btn").href = driver.phone !== "N/A" ? `tel:${driver.phone}` : "#";
+                    document.getElementById("contact-message").value = "";
+                    openModal(contactModal);
+                    return;
+                }
+
+                const abandonButton = event.target.closest(".abandon-task-trigger");
+                if (abandonButton) {
+                    const task = complaints.find((item) => item.complaint_id === abandonButton.dataset.id);
+                    if (!task) return;
+                    activeOngoingTask = task;
+                    document.getElementById("abandon-task-id").textContent = `#${task.complaint_id}`;
+                    openModal(abandonModal);
+                }
+            });
+
+            document.getElementById("approve-btn").addEventListener("click", async () => {
+                if (!activeVerificationTask) return;
+                try {
+                    await updateComplaint(`https://novomesh-backend.onrender.com/api/admin/complaint/${encodeURIComponent(activeVerificationTask.complaint_id)}/verify`);
+                    closeAllModals();
+                    await loadData();
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            document.getElementById("reject-trigger-btn").addEventListener("click", () => {
+                openModal(rejectModal);
+            });
+
+            document.getElementById("reject-comment").addEventListener("input", (event) => {
+                document.getElementById("confirm-reject-btn").disabled = event.target.value.trim().length === 0;
+            });
+
+            document.getElementById("confirm-reject-btn").addEventListener("click", async () => {
+                const reason = document.getElementById("reject-comment").value.trim();
+                if (!activeVerificationTask || !reason) return;
+                try {
+                    await updateComplaint(
+                        `https://novomesh-backend.onrender.com/api/admin/complaint/${encodeURIComponent(activeVerificationTask.complaint_id)}/reject-verification`,
+                        { reason }
+                    );
+                    document.getElementById("reject-comment").value = "";
+                    document.getElementById("confirm-reject-btn").disabled = true;
+                    closeAllModals();
+                    await loadData();
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            document.getElementById("confirm-abandon-btn").addEventListener("click", async () => {
+                if (!activeOngoingTask) return;
+                try {
+                    await updateComplaint(`https://novomesh-backend.onrender.com/api/admin/complaint/${encodeURIComponent(activeOngoingTask.complaint_id)}/abandon`);
+                    closeAllModals();
+                    await loadData();
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            document.getElementById("send-message-btn").addEventListener("click", () => {
+                const message = document.getElementById("contact-message").value.trim();
+                if (!message) {
+                    alert("Please enter a message first.");
+                    return;
+                }
+                alert("Message noted for follow-up.");
+                closeAllModals();
+            });
+
+            document.querySelectorAll(".close-modal, .close-reject-modal, .close-abandon-modal, .close-contact-modal").forEach((button) => {
+                button.addEventListener("click", closeAllModals);
+            });
+
+            [verificationModal, rejectModal, abandonModal, contactModal].forEach((modal) => {
+                modal.addEventListener("click", (event) => {
+                    if (event.target === modal) closeAllModals();
+                });
+            });
+
+            loadData().catch((error) => {
+                const message = escapeHtml(error.message);
+                verificationList.innerHTML = `<p class="text-red-400">Failed to load tasks: ${message}</p>`;
+                ongoingList.innerHTML = `<p class="text-red-400 col-span-full">Failed to load tasks: ${message}</p>`;
+                historyTableBody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-red-400">Failed to load tasks: ${message}</td></tr>`;
+            });
+        });
+    </script>
+</body>
+</html>

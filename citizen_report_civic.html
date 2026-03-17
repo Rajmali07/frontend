@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report Civic Issue - Citizen Dashboard</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'smart-green': '#28a745',
+            'smart-green-light': '#dcfce7',
+            'smart-blue': '#17a2b8',
+            'smart-blue-light': '#d4f0f5',
+            'smart-yellow': '#ffc107',
+            'smart-dark': '#333333',
+            'smart-gray': '#6c757d',
+            'smart-red': '#dc3545',
+            'smart-red-light': '#fdebec',
+          },
+          fontFamily: {
+            'roboto': ['Roboto', 'sans-serif'],
+          },
+          boxShadow: {
+            'header': '0 2px 6px rgba(0,0,0,0.1)',
+            'card': '0 4px 12px rgba(0,0,0,0.1)',
+            'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+            'top': '0 -2px 6px rgba(0,0,0,0.1)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+    .spinner { border: 4px solid rgba(0,0,0,0.1); border-left-color: #ffffff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+    .spinner-dark { border: 4px solid rgba(0,0,0,0.1); border-left-color: #333; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .drag-area-dashed { border: 2px dashed #d1d5db; transition: all 0.3s; }
+    .drag-area-dashed.drag-over { background-color: #dcfce7; border-color: #28a745; }
+    .modal { transition: opacity 0.25s ease, visibility 0.25s ease; }
+    .modal-content { transition: transform 0.25s ease; }
+  </style>
+</head>
+
+<body class="font-roboto text-smart-dark antialiased">
+
+  <!-- Header -->
+  <header class="bg-white shadow-header fixed top-0 left-0 right-0 z-40">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+      <a href="citizen_dashboard.html" class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+          <path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span class="text-xl font-bold text-smart-green hidden sm:block">Citizen Portal</span>
+      </a>
+
+      <div class="relative">
+        <button id="profile-btn" class="flex items-center space-x-2 focus:outline-none">
+          <span id="citizen-name" class="text-smart-dark font-medium hidden md:block">Hello!</span>
+          <img class="w-10 h-10 rounded-full object-cover border-2 border-smart-green" src="https://placehold.co/100x100/EAF7E8/28a745?text=A" alt="Profile Picture">
+        </button>
+        <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 hidden">
+          <a href="citizen_profile.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">View Profile</a>
+          <a href="citizen_settings.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">Settings</a>
+          <div class="border-t border-gray-100 my-1"></div>
+          <a href="index.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+    <section id="intro" class="mb-8 p-6 md:p-8 bg-white rounded-2xl shadow-card flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex-1">
+        <h1 class="text-3xl font-bold text-smart-dark mb-2">Report a Civic Issue</h1>
+        <p class="text-lg text-smart-gray">Report potholes, broken lights, water logging and other civic issues.</p>
+      </div>
+      <div class="flex-shrink-0">
+        <img src="https://placehold.co/150x100/D4F0F5/17a2b8?text=Civic+Issue" alt="Report Issue" class="hidden md:block w-36 h-auto rounded-lg">
+      </div>
+    </section>
+
+    <section id="complaint-form" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form id="civic-form" class="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl shadow-card space-y-6">
+        <!-- Issue Type -->
+        <div>
+          <label for="issue-type" class="block text-lg font-bold text-smart-dark mb-2">1. Select Issue Type</label>
+          <p class="text-sm text-smart-gray mb-4">Choose the category that best fits the problem.</p>
+          <select id="issue-type" name="issue-type" required class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-smart-blue">
+            <option value="" disabled selected>Select an issue type...</option>
+            <option value="pothole">Pothole / Road Damage</option>
+            <option value="streetlight">Broken Streetlight</option>
+            <option value="drainage">Drainage / Water Logging</option>
+            <option value="illegal-dumping">Illegal Waste Dumping</option>
+            <option value="public-property">Damaged Public Property</option>
+            <option value="water-leak">Water Pipe Leakage</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <!-- Photo Upload -->
+        <div>
+          <label class="block text-lg font-bold text-smart-dark mb-2">2. Upload Photo (Optional)</label>
+          <p class="text-sm text-smart-gray mb-4">A photo helps us understand the issue better.</p>
+
+          <input type="file" id="camera-upload" class="hidden" accept="image/*" capture="environment">
+          <input type="file" id="gallery-upload" class="hidden" accept="image/png, image/jpeg, image/webp">
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <label for="camera-upload" class="flex-1 flex items-center justify-center space-x-2 bg-smart-blue text-white font-medium py-3 px-5 rounded-lg cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Take Photo</span>
+            </label>
+
+            <label for="gallery-upload" id="drag-area" class="flex-1 drag-area-dashed bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-smart-blue-light">
+              <p class="font-medium text-smart-dark">or Drag & Drop</p>
+              <p class="text-smart-gray text-sm"><span class="text-smart-blue font-medium">Click to browse</span></p>
+            </label>
+          </div>
+
+          <div id="preview-container" class="hidden mt-4 space-y-3">
+            <img id="image-preview" src="#" alt="Uploaded issue photo" class="max-h-60 w-auto rounded-lg shadow-md mx-auto">
+            <button type="button" id="remove-image" class="block mx-auto text-sm text-smart-red hover:underline">Remove Image</button>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label for="location" class="block text-lg font-bold text-smart-dark mb-2">3. Confirm Location</label>
+          <p class="text-sm text-smart-gray mb-4">Drag the pin or use auto-detect to set the exact location.</p>
+          <div class="relative flex flex-col sm:flex-row gap-4">
+            <input type="text" id="location" name="location" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-smart-blue" placeholder="Enter address or landmark">
+            <button type="button" id="detect-location-btn" class="flex-shrink-0 flex items-center justify-center space-x-2 bg-smart-blue text-white font-medium py-3 px-5 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span id="detect-text">Auto-Detect</span>
+              <span id="detect-spinner" class="spinner hidden"></span>
+            </button>
+          </div>
+          <div id="map-placeholder" class="mt-4 rounded-lg overflow-hidden h-48 bg-gray-200 flex items-center justify-center">
+            <img src="https://placehold.co/600x300/E0E0E0/9E9E9E?text=Static+Map+Placeholder" alt="Map Placeholder" class="w-full h-full object-cover">
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="description" class="block text-lg font-bold text-smart-dark mb-2">4. Additional Details</label>
+          <textarea id="description" name="description" rows="4" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-smart-blue" placeholder="e.g., 'Large pothole near the bank' " maxlength="250"></textarea>
+          <p id="char-counter" class="text-right text-sm text-smart-gray mt-1">250 characters remaining</p>
+        </div>
+
+        <!-- Submit -->
+        <div class="text-right border-t pt-6">
+          <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-smart-green text-white font-bold py-3 px-8 rounded-lg flex items-center justify-center space-x-2">
+            <span id="submit-text">Submit Report</span>
+            <span id="submit-spinner" class="spinner hidden" role="status" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+
+      <aside class="space-y-8">
+        <div class="bg-white p-6 rounded-2xl shadow-card">
+          <h4 class="text-xl font-bold text-smart-dark mb-4 flex items-center space-x-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>Reporting Tips</span></h4>
+          <ul class="space-y-3 text-sm text-smart-gray list-disc list-inside">
+            <li>Select the most accurate issue type.</li>
+            <li>Provide a clear and concise description.</li>
+            <li>If safe, take a photo from a distance to show context.</li>
+            <li>Use auto-detect for the most accurate location.</li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-card">
+          <h4 class="text-xl font-bold text-smart-dark mb-4">Reporting a Bin Issue?</h4>
+          <p class="text-smart-gray mb-4">If you need to report a full or overflowing garbage bin, please use our dedicated form.</p>
+          <a href="citizen_report_bin.html" class="inline-block w-full text-center bg-smart-green text-white font-medium py-3 px-5 rounded-lg">Report Full Bin</a>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-top z-40 h-16 flex justify-around items-center md:hidden">
+    <a href="citizen_dashboard.html" class="flex flex-col items-center text-smart-gray hover:text-smart-green p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="text-xs">Home</span>
+    </a>
+    <a href="citizen_report_bin.html" class="flex flex-col items-center text-smart-green p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2"/></svg><span class="text-xs">Report</span>
+    </a>
+    <a href="citizen_report_history.html" class="flex flex-col items-center text-smart-gray p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span class="text-xs">History</span>
+    </a>
+    <a href="citizen_profile.html" class="flex flex-col items-center text-smart-gray p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="text-xs">Profile</span>
+    </a>
+  </nav>
+
+  <!-- SUCCESS MODAL (only one instance) -->
+  <div id="success-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 invisible opacity-0">
+    <div class="modal-content bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full text-center transform scale-95">
+      <div class="w-16 h-16 bg-smart-green-light rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3 class="text-2xl font-bold text-smart-dark mb-2">Report Submitted!</h3>
+      <p class="text-smart-gray mb-2">Your complaint ID is <strong id="modal-complaint-id" class="text-smart-dark">#—</strong>.</p>
+      <p class="text-smart-gray mb-6">You can track its status on the "History" page.</p>
+      <button id="modal-close-btn" class="w-full bg-smart-green text-white font-bold py-3 px-6 rounded-lg hover:bg-opacity-90">Done</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ELEMENTS
+      const profileBtn = document.getElementById('profile-btn');
+      const profileDropdown = document.getElementById('profile-dropdown');
+      const civicForm = document.getElementById('civic-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const submitText = document.getElementById('submit-text');
+      const submitSpinner = document.getElementById('submit-spinner');
+
+      const detectLocationBtn = document.getElementById('detect-location-btn');
+      const detectText = document.getElementById('detect-text');
+      const detectSpinner = document.getElementById('detect-spinner');
+      const locationInput = document.getElementById('location');
+
+      const cameraUpload = document.getElementById('camera-upload');
+      const galleryUpload = document.getElementById('gallery-upload');
+      const dragArea = document.getElementById('drag-area');
+      const previewContainer = document.getElementById('preview-container');
+      const imagePreview = document.getElementById('image-preview');
+      const removeImageBtn = document.getElementById('remove-image');
+
+      const descriptionEl = document.getElementById('description');
+      const charCounter = document.getElementById('char-counter');
+
+      const successModal = document.getElementById('success-modal');
+      const modalComplaintId = document.getElementById('modal-complaint-id');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+
+      let uploadedFile = null;
+
+      // PROFILE DROPDOWN
+      profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+      window.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) profileDropdown.classList.add('hidden');
+      });
+
+      // FILE HANDLING
+      function handleFile(file) {
+        if (file && file.type.startsWith('image/')) {
+          uploadedFile = file;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            previewContainer.classList.remove('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      cameraUpload.addEventListener('change', (e) => handleFile(e.target.files[0]));
+      galleryUpload.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+      removeImageBtn.addEventListener('click', () => {
+        uploadedFile = null;
+        cameraUpload.value = '';
+        galleryUpload.value = '';
+        imagePreview.src = '#';
+        previewContainer.classList.add('hidden');
+      });
+
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dragArea.addEventListener(eventName, preventDefaults, false);
+      });
+      function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+      dragArea.addEventListener('dragenter', () => dragArea.classList.add('drag-over'), false);
+      dragArea.addEventListener('dragleave', () => dragArea.classList.remove('drag-over'), false);
+      dragArea.addEventListener('drop', (e) => { dragArea.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); }, false);
+
+      // CHAR COUNTER
+      descriptionEl.addEventListener('input', () => {
+        const remaining = 250 - descriptionEl.value.length;
+        charCounter.textContent = remaining + ' characters remaining';
+      });
+
+      // OPTIONAL: Detect location (mock example)
+      detectLocationBtn.addEventListener('click', async () => {
+        detectSpinner.classList.remove('hidden');
+        detectText.textContent = 'Detecting...';
+        try {
+          if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+              // For a production app you'd convert lat/lng to an address with reverse geocoding
+              const lat = pos.coords.latitude.toFixed(5), lon = pos.coords.longitude.toFixed(5);
+              locationInput.value = `Lat: ${lat}, Lon: ${lon}`;
+              detectText.textContent = 'Auto-Detect';
+            }, () => {
+              detectText.textContent = 'Auto-Detect';
+              alert('Unable to detect location.');
+            });
+          } else {
+            alert('Geolocation not supported by your browser.');
+            detectText.textContent = 'Auto-Detect';
+          }
+        } catch (err) {
+          console.error(err);
+          detectText.textContent = 'Auto-Detect';
+        } finally {
+          detectSpinner.classList.add('hidden');
+        }
+      });
+
+// FORM SUBMIT
+civicForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  submitBtn.disabled = true;
+  submitText.classList.add('hidden');
+  submitSpinner.classList.remove('hidden');
+
+  const userRaw = localStorage.getItem('citizenUser');
+  const user = userRaw ? JSON.parse(userRaw) : null;
+  if (!user || !user.email) {
+    alert('You must be logged in to submit a report.');
+    window.location.href = 'citizen_login.html';
+    return;
+  }
+
+  const issue_type = document.getElementById('issue-type').value;
+  const description = descriptionEl.value;
+  const location = locationInput.value;
+
+  const formData = new FormData();
+  formData.append('issue_type', issue_type);
+  formData.append('description', description);
+  formData.append('location', location);
+  formData.append('email', user.email);
+  if (uploadedFile) formData.append('photo', uploadedFile);
+
+  try {
+    const res = await fetch('https://novomesh-backend.onrender.com/api/v1/reports/civic', { 
+  method: 'POST',
+  body: formData,
+});
+
+    const data = await res.json();
+
+    if (res.ok) {
+      const complaintId = data.complaintId || data.complaint_id || 
+        (data.report && (data.report.complaint_id || data.report.complaintId)) || null;
+
+      modalComplaintId.textContent = complaintId ? `#${complaintId}` : '#—';
+
+      successModal.classList.remove('invisible', 'opacity-0');
+      successModal.classList.add('visible', 'opacity-100');
+
+      civicForm.reset();
+      uploadedFile = null;
+      previewContainer.classList.add('hidden');
+      imagePreview.src = '#';
+    } else {
+      alert(data.message || 'An error occurred while submitting your report.');
+    }
+  } catch (err) {
+    console.error("❌ Error creating civic report:", err);
+    alert("Failed to submit report. Please try again.");
+  } finally {
+    submitSpinner.classList.add('hidden');
+    submitText.classList.remove('hidden');
+    submitBtn.disabled = false;
+  }
+});
+      // MODAL CLOSE (Option B - redirect only when user clicks Done)
+      modalCloseBtn.addEventListener('click', () => {
+        // Hide modal
+        successModal.classList.add('invisible', 'opacity-0');
+        successModal.classList.remove('visible', 'opacity-100');
+
+        // Redirect to dashboard page
+        window.location.href = "citizen_dashboard.html";
+      });
+
+      // accessibility: close modal on Escape
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !successModal.classList.contains('invisible')) {
+          successModal.classList.add('invisible', 'opacity-0');
+          successModal.classList.remove('visible', 'opacity-100');
+        }
+      });
+      
+
+    }); // DOMContentLoaded
+  </script>
+</body>
+</html>

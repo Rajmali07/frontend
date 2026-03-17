@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Map Operations - Swach Raipur</title>
+
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Configure Tailwind (Copied from Dashboard) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': 'var(--color-smart-green, #28a745)',
+                        'smart-green-light': 'var(--color-smart-green-light, #dcfce7)',
+                        'smart-blue': 'var(--color-smart-blue, #17a2b8)',
+                        'smart-blue-light': 'var(--color-smart-blue-light, #d4f0f5)',
+                        'smart-yellow': 'var(--color-smart-yellow, #ffc107)',
+                        'smart-red': 'var(--color-smart-red, #dc3545)',
+                        'smart-dark': 'var(--color-smart-dark, #333333)',
+                        'smart-gray': 'var(--color-smart-gray, #6c757d)',
+                        'background-light': 'var(--color-background-light, #f8f9fa)',
+                        'card-background-light': 'var(--color-card-background-light, #ffffff)',
+                        'text-light': 'var(--color-text-light, #333333)',
+                        'border-light': 'var(--color-border-light, #e2e8f0)',
+                        'background-dark': 'var(--color-background-dark, #1a202c)',
+                        'card-background-dark': 'var(--color-card-background-dark, #2d3748)',
+                        'text-dark': 'var(--color-text-dark, #e2e8f0)',
+                        'border-dark': 'var(--color-border-dark, #4a5568)',
+                    },
+                    fontFamily: { 'roboto': ['Roboto', 'sans-serif'], },
+                    boxShadow: { 'header': '0 2px 6px rgba(0,0,0,0.1)', 'card': '0 4px 12px rgba(0,0,0,0.08)', }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base and Dark Mode styles are the same as Dashboard for consistency */
+        :root {
+            /* Light Theme Defaults */
+            --color-smart-green: #28a745;
+            --color-smart-green-light: #dcfce7;
+            --color-smart-blue: #17a2b8;
+            --color-smart-blue-light: #d4f0f5;
+            --color-smart-yellow: #ffc107;
+            --color-smart-red: #dc3545;
+            --color-smart-dark: #333333;
+            --color-smart-gray: #6c757d;
+            --color-background-light: #f8f9fa;
+            --color-card-background-light: #ffffff;
+            --color-text-light: #333333;
+            --color-border-light: #e2e8f0;
+            --overlay: rgba(21, 61, 36, 0.92);
+            --text-normal: #ffffffd9;
+            --text-hover: #ffffff;
+            --hover-glow: 0 0 12px rgba(255, 255, 255, 0.6);
+        }
+
+        .dark {
+            --color-smart-dark: #e2e8f0;
+            --color-smart-gray: #a0aec0;
+            --color-background-light: #1a202c;
+            --color-card-background-light: #2d3748;
+            --color-text-light: #e2e8f0;
+            --color-border-light: #4a5568;
+            --chart-label-color: #e2e8f0;
+            --chart-grid-color: rgba(160, 174, 192, 0.2);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--color-background-light);
+            color: var(--color-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            height: 100vh;
+            /* Ensure body takes full height */
+            overflow: hidden;
+            /* Prevent scrolling of map background */
+        }
+
+        /* Map Styles */
+        #map {
+            width: 100%;
+            height: calc(100vh - 64px);
+            /* Full height minus header height */
+            position: relative;
+        }
+
+        .leaflet-container {
+            background: var(--color-background-light);
+        }
+
+        /* Custom Pin Icon Styles for Bins and Drivers */
+        .bin-pin,
+        .driver-pin {
+            width: 24px;
+            height: 24px;
+            background-color: transparent;
+            border-radius: 50%;
+            border: none;
+            text-align: center;
+        }
+
+        .bin-icon {
+            /* Red/Yellow/Green Circle */
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            border: 2px solid white;
+        }
+
+        .driver-icon {
+            /* Blue Truck */
+            color: var(--color-smart-blue);
+            font-size: 20px;
+            transform: translateY(-2px);
+        }
+
+        .pulse {
+            /* For the currently selected/alert bin */
+            animation: pulse-ring 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.6);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Sidebar Styles (Copied from Dashboard) */
+        .u-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
+            z-index: 9998;
+        }
+
+        .u-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .u-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            color: var(--text-normal);
+            display: grid;
+            grid-template-rows: auto 1fr;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .u-overlay.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .u-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+        }
+
+        .u-logo {
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--text-hover);
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+        }
+
+        .u-close {
+            background: transparent;
+            border: 0;
+            color: var(--text-normal);
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+
+        .u-close:hover {
+            color: var(--text-hover);
+            transform: rotate(90deg);
+            text-shadow: var(--hover-glow);
+        }
+
+        .u-menu {
+            display: grid;
+            place-items: center;
+            align-content: center;
+            gap: 20px;
+            padding: 32px 16px;
+            text-align: center;
+        }
+
+        .u-item {
+            display: block;
+            background: transparent;
+            border: none;
+            color: var(--text-normal);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: clamp(16px, 2.3vw, 22px);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 22px;
+            border-radius: 12px;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .u-item:hover {
+            color: var(--text-hover);
+            text-shadow: var(--hover-glow);
+            transform: scale(1.05);
+        }
+
+        .u-menu::before,
+        .u-menu::after {
+            content: "";
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.05), transparent);
+            display: block;
+        }
+
+        /* Assignment Panel (Slide-out) */
+        #assignment-panel {
+            position: fixed;
+            top: 64px;
+            /* Below header */
+            right: 0;
+            width: 380px;
+            max-width: 90%;
+            height: calc(100vh - 64px);
+            background-color: var(--color-card-background-light);
+            z-index: 50;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+            overflow-y: auto;
+            border-left: 4px solid var(--color-smart-blue);
+        }
+
+        #assignment-panel.open {
+            transform: translateX(0);
+        }
+
+        .driver-card:hover {
+            background-color: var(--color-smart-blue-light);
+            cursor: pointer;
+        }
+
+        .driver-card.assigned {
+            background-color: var(--color-smart-green-light);
+            border-color: var(--color-smart-green);
+        }
+    </style>
+</head>
+
+<body class="font-roboto antialiased">
+
+    <!-- Dashboard Header (Copied) -->
+    <header
+        class="bg-white dark:bg-card-background-dark shadow-header sticky top-0 left-0 right-0 z-40 h-16 transition-colors duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
+            <!-- Logo --><a href="admin_dashboard.html" class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="text-smart-blue">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <polyline points="12 5 12 12 16 12"></polyline>
+                </svg>
+                <span class="text-xl font-bold text-smart-blue dark:text-text-dark hidden sm:block">Live Map
+                    Operations</span>
+            </a>
+
+            <!-- Right Side Controls (Profile & Hamburger) -->
+            <div class="flex items-center space-x-4">
+                <!-- Profile Dropdown (for larger screens) -->
+                <div class="relative hidden sm:block">
+                    <button id="profile-btn" class="flex items-center space-x-2 focus:outline-none">
+                        <span class="text-smart-dark dark:text-text-dark font-medium hidden md:block">Admin User</span>
+                        <img class="w-10 h-10 rounded-full object-cover border-2 border-smart-blue"
+                            src="https://placehold.co/100x100/DBEAFE/17a2b8?text=AD" alt="Admin Profile Picture">
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="profile-dropdown"
+                        class="absolute right-0 mt-2 w-48 bg-white dark:bg-card-background-dark rounded-lg shadow-lg py-1 z-50 hidden border border-border-light dark:border-border-dark transition-colors duration-300">
+                        <a href="admin_dashboard.html"
+                            class="block px-4 py-2 text-sm text-smart-dark dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                        <a href="admin_settings.html"
+                            class="block px-4 py-2 text-sm text-smart-dark dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                        <div class="border-t border-gray-100 dark:border-border-dark my-1"></div>
+                        <a href="index.html"
+                            class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                    </div>
+                </div>
+
+                <!-- Hamburger Menu for Sidebar (Rightmost) --><button id="hamburger-btn"
+                    class="text-smart-dark dark:text-text-dark p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-smart-blue transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Overlay (Copied) -->
+    <div id="u-backdrop" class="u-backdrop"></div>
+    <aside id="u-overlay" class="u-overlay" aria-modal="true" role="dialog" aria-label="Admin menu">
+        <div class="u-top">
+            <div class="u-logo">Swach Raipur</div>
+            <button id="u-close" class="u-close" aria-label="Close menu">&times;</button>
+        </div>
+        <nav class="u-menu">
+            <a href="admin_dashboard.html" class="u-item">HOME</a>
+            <a href="admin_map_operations.html" class="u-item">MAP OPERATIONS</a>
+            <a href="admin_task_review.html" class="u-item">TASK REVIEW</a>
+            <a href="admin_complaint_review.html" class="u-item">COMPLAINT TRIAGE</a>
+            <a href="admin_user_management.html" class="u-item">DRIVER MANAGEMENT</a>
+            <a href="admin_settings.html#feedback" class="u-item">FEEDBACK</a>
+            <a href="admin_settings.html#blogs" class="u-item">BLOGS</a>
+            <a href="admin_settings.html" class="u-item">SETTINGS</a>
+        </nav>
+    </aside>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Assignment Panel (Slide-in from right) -->
+    <div id="assignment-panel" class="p-4 flex flex-col">
+        <button id="close-panel-btn"
+            class="absolute top-3 right-3 text-smart-gray hover:text-smart-dark text-xl">&times;</button>
+
+        <h2 class="text-2xl font-bold text-smart-dark dark:text-text-dark mb-1">Assign Task</h2>
+        <p class="text-sm text-smart-gray dark:text-gray-400 mb-4">Complaint ID: <span id="panel-task-id"
+                class="font-bold text-smart-red">#WMC-8355</span></p>
+
+        <div class="card p-3 mb-4 border-l-4 border-smart-red">
+            <p class="text-sm font-semibold">स्थान (Location): <span id="panel-location">Sector 4, Near School
+                    Gate</span></p>
+            <p class="text-sm text-smart-gray dark:text-gray-400">स्थिति (Status): <span id="panel-status">CRITICAL
+                    OVERFLOW (AI Verified)</span></p>
+        </div>
+
+        <h3 class="font-bold text-smart-dark dark:text-text-dark mb-3">सबसे पास के ड्राइवर (Nearest Available Drivers):
+        </h3>
+
+        <!-- Driver List -->
+        <div id="nearest-drivers-list" class="space-y-3 flex-1 overflow-y-auto pr-1">
+            <!-- Driver Card 1 (Nearest) -->
+            <div class="driver-card p-3 border rounded-lg border-border-light dark:border-border-dark flex justify-between items-center"
+                data-driver-id="D-5678">
+                <div>
+                    <p class="font-bold text-smart-dark dark:text-text-dark">Ram Singh (D-5678)</p>
+                    <p class="text-xs text-smart-gray dark:text-gray-400">दूरी (Distance): 1.2 km | स्थिति (Status):
+                        उपलब्ध (Available)</p>
+                </div>
+                <button
+                    class="bg-smart-blue text-white text-xs font-medium py-1 px-3 rounded-full hover:bg-blue-600 assign-driver-btn">असाइन
+                    करें (Assign)</button>
+            </div>
+            <!-- Driver Card 2 -->
+            <div class="driver-card p-3 border rounded-lg border-border-light dark:border-border-dark flex justify-between items-center"
+                data-driver-id="D-7122">
+                <div>
+                    <p class="font-bold text-smart-dark dark:text-text-dark">Priya Sharma (D-7122)</p>
+                    <p class="text-xs text-smart-gray dark:text-gray-400">दूरी (Distance): 2.5 km | स्थिति (Status):
+                        उपलब्ध (Available)</p>
+                </div>
+                <button
+                    class="bg-smart-blue text-white text-xs font-medium py-1 px-3 rounded-full hover:bg-blue-600 assign-driver-btn">असाइन
+                    करें (Assign)</button>
+            </div>
+            <!-- Driver Card 3 (Assigned - Example) -->
+            <div class="driver-card assigned p-3 border rounded-lg border-smart-green flex justify-between items-center"
+                data-driver-id="D-1001">
+                <div>
+                    <p class="font-bold text-smart-green">Ahmed Khan (D-1001)</p>
+                    <p class="text-xs text-smart-gray dark:text-gray-400">असाइन किया गया (Assigned): Bin #WMC-8301 (4.8
+                        km)</p>
+                </div>
+                <span class="text-xs text-smart-green font-bold">कार्य पर (ON TASK)</span>
+            </div>
+        </div>
+
+        <!-- Assignment Confirmation Footer -->
+        <div id="assignment-result" class="mt-4 p-3 bg-smart-blue-light dark:bg-gray-700 rounded-lg hidden">
+            <p class="text-sm font-bold text-smart-blue dark:text-text-dark">Task successfully assigned to Driver
+                D-5678!</p>
+            <p class="text-xs text-smart-gray dark:text-gray-400">ड्राइवर को 3 बार सूचित किया गया। कार्य मानचित्र अलर्ट
+                से हटा दिया गया।</p>
+        </div>
+    </div>
+
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="../assets/js/admin.js"></script>
+    <script src="../assets/js/darkmode.js"></script>
+</body>
+
+</html>

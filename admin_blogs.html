@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogs Management - Swach Raipur Admin</title>
+
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        // Check local storage for 'dark' preference before loading CSS/JS
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (savedTheme === 'system' && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            // FIX: Removed dynamic style injection to restore fluid transition.
+        }
+    </script>
+
+    <!-- Configure Tailwind (Copied from Dashboard) --><script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': 'var(--color-smart-green, #28a745)',
+                        'smart-green-light': 'var(--color-smart-green-light, #dcfce7)',
+                        'smart-blue': 'var(--color-smart-blue, #17a2b8)',
+                        'smart-blue-light': 'var(--color-smart-blue-light, #d4f0f5)',
+                        'smart-yellow': 'var(--color-smart-yellow, #ffc107)',
+                        'smart-red': 'var(--color-smart-red, #dc3545)',
+                        'smart-dark': 'var(--color-smart-dark, #333333)',
+                        'smart-gray': 'var(--color-smart-gray, #6c757d)',
+                        'background-light': 'var(--color-background-light, #f8f9fa)',
+                        'card-background-light': 'var(--color-card-background-light, #ffffff)',
+                        'text-light': 'var(--color-text-light, #333333)',
+                        'border-light': 'var(--color-border-light, #e2e8f0)',
+                        'background-dark': 'var(--color-background-dark, #1a202c)',
+                        'card-background-dark': 'var(--color-card-background-dark, #2d3748)',
+                        'text-dark': 'var(--color-text-dark, #e2e8f0)',
+                        'border-dark': 'var(--color-border-dark, #4a5568)',
+                    },
+                    fontFamily: { 'roboto': ['Roboto', 'sans-serif'], },
+                    boxShadow: { 'header': '0 2px 6px rgba(0,0,0,0.1)', 'card': '0 4px 12px rgba(0,0,0,0.08)', }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base and Dark Mode styles are the same as Dashboard for consistency */
+        :root {
+            /* Light Theme Defaults */
+            --color-smart-green: #28a745;
+            --color-smart-green-light: #dcfce7;
+            --color-smart-blue: #17a2b8;
+            --color-smart-blue-light: #d4f0f5;
+            --color-smart-yellow: #ffc107;
+            --color-smart-red: #dc3545;
+            --color-smart-dark: #333333;
+            --color-smart-gray: #6c757d;
+            --color-background-light: #f8f9fa;
+            --color-card-background-light: #ffffff;
+            --color-text-light: #333333;
+            --color-border-light: #e2e8f0;
+            --overlay: rgba(21, 61, 36, 0.92);
+            --text-normal: #ffffffd9;
+            --text-hover: #ffffff;
+            --hover-glow: 0 0 12px rgba(255, 255, 255, 0.6);
+
+            /* LIGHT MODE SIDEBAR DEFAULTS */
+            --sidebar-bg: #28a745; 
+            --sidebar-text: #ffffff;
+            --sidebar-hover-bg: #208135; 
+            --sidebar-active-bg: #208135;
+        }
+
+        .dark {
+            --color-smart-dark: #e2e8f0;
+            --color-smart-gray: #a0aec0;
+            --color-background-light: #1a202c;
+            --color-card-background-light: #2d3748;
+            --color-text-light: #e2e8f0;
+            --color-border-light: #4a5568;
+            --chart-label-color: #e2e8f0;
+            --chart-grid-color: rgba(160, 174, 192, 0.2);
+
+            /* DARK MODE SIDEBAR OVERRIDE */
+            --sidebar-bg: #1a472a; 
+            --sidebar-hover-bg: #208135;
+            --sidebar-active-bg: #208135;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--color-background-light);
+            color: var(--color-text-light);
+            /* This property handles the fluid transition */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Sidebar Styling (Solid Green) */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            box-shadow: var(--tw-shadow-sidebar);
+            flex-shrink: 0;
+            height: 100vh; /* Fixed height for fixed position */
+        }
+        .sidebar-link {
+            transition: background-color 0.2s, color 0.2s;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-link:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-text);
+        }
+        .sidebar-link.active {
+            background-color: var(--sidebar-active-bg);
+            font-weight: 700;
+            color: var(--sidebar-text);
+        }
+        .sidebar-footer-link:hover {
+            color: #ffc107;
+            text-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+        }
+
+        /* Generic card styling */
+        .card {
+            background-color: var(--color-card-background-light);
+            border-radius: 0.75rem;
+            box-shadow: var(--tw-shadow-card, 0 4px 12px rgba(0, 0, 0, 0.08));
+            padding: 1.5rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            color: var(--color-text-light);
+        }
+
+        /* Blog specific status styles */
+        .status-published { color: var(--color-smart-green); font-weight: 500; }
+        .status-draft { color: var(--color-smart-yellow); font-weight: 500; }
+    </style>
+</head>
+
+<body class="font-roboto antialiased flex min-h-screen">
+
+    <!-- New: Mobile Backdrop for Sidebar (Clickable to close) -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden"></div>
+
+    <!-- 1. Full Sidebar (Desktop Mode - Fixed) -->
+    <aside id="sidebar" class="sidebar fixed top-0 bottom-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+        
+        <!-- Sidebar Header (Logo & Title) --><div class="p-6 flex items-center space-x-3 flex-shrink-0">
+            <img src="assets/logo/swachchh_raipur.svg" alt="Swach Raipur Logo" class="h-10 w-auto rounded-lg">
+            <div>
+                <h1 class="text-xl font-bold text-white leading-tight">Swach Raipur</h1>
+                <p class="text-sm font-light text-green-100 leading-tight">Admin Panel</p>
+            </div>
+        </div>
+
+        <!-- Navigation Links (Finalized List) --><nav class="flex-grow space-y-2 p-4 pt-6 text-base">
+            <a href="admin_dashboard.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="zones.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>Zones</span>
+            </a>
+            <a href="admin_task_review.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>Task Review</span>
+            </a>
+            <a href="admin_user_management.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                <span>Driver Management</span>
+            </a>
+            <a href="admin_feedback.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Feedback</span>
+            </a>
+            <a href="admin_blogs.html" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="11" x2="15" y2="11"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>
+                <span>Blog</span>
+            </a>
+            <a href="analytics.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4"></path><polyline points="17 9 12 4 7 9"></polyline><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                <span>Analytics</span>
+            </a>
+            <a href="profile.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Profile</span>
+            </a>
+            <a href="admin_settings.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09z"></path></svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Footer / Logout Button (Bottom) --><div class="p-6 flex-shrink-0 border-t border-green-700">
+            <!-- Link goes up one folder (../) to index.html --><a href="index.html" id="admin-logout-link" class="sidebar-footer-link flex items-center justify-center space-x-2 p-3 rounded-lg text-yellow-300 font-semibold transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span class="text-sm">LOGOUT</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- 2. Mobile/Top Header (Hidden on Desktop) --><header class="bg-white dark:bg-card-background-light shadow-header fixed top-0 left-0 right-0 z-40 h-16 transition-colors duration-300 lg:hidden">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
+            <!-- Logo (Mobile) --><a href="admin_dashboard.html" class="flex items-center space-x-2">
+                <img src="assets/logo/swachchh_raipur.svg" alt="Logo" class="h-10 w-auto">
+                <span class="text-xl font-bold text-smart-dark dark:text-text-light">Dashboard</span>
+            </a>
+            <!-- Hamburger Menu for Sidebar (Rightmost) --><button id="hamburger-btn" class="text-smart-dark dark:text-text-light p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-smart-green transition-colors duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- 3. Main Content Wrapper (Shifted right on Desktop) --><main class="lg:ml-[280px] flex-grow container mx-auto px-4 sm:px-6 lg:px-8 lg:pt-8 pt-20 pb-12 transition-colors duration-300">
+        
+        <section class="mb-6">
+            <h1 class="text-3xl font-bold text-smart-dark dark:text-text-light">Blog Content Management</h1>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Column 1 & 2: Blog Post List (Left/Main) -->
+            <div class="lg:col-span-2">
+                <div class="card mb-6">
+                    <h2 id="post-count-header"
+                        class="card-header border-b border-border-light dark:border-border-dark pb-3">Existing Posts (2)
+                    </h2>
+
+                    <!-- Blog Table -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-smart-gray dark:text-gray-400 uppercase tracking-wider">
+                                        Title</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-smart-gray dark:text-gray-400 uppercase tracking-wider">
+                                        Category</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-smart-gray dark:text-gray-400 uppercase tracking-wider">
+                                        Date</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-smart-gray dark:text-gray-400 uppercase tracking-wider">
+                                        Status</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-smart-gray dark:text-gray-400 uppercase tracking-wider">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blog-table-body" class="divide-y divide-border-light dark:divide-border-dark">
+</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3: Add/Edit Post Panel (Sticky) -->
+            <div class="lg:col-span-1">
+                <div class="card sticky top-20">
+                    <h2 id="post-panel-header"
+                        class="card-header border-b border-border-light dark:border-border-dark pb-3 mb-6">Create New
+                        Post</h2>
+
+                    <form id="blog-post-form" class="space-y-4">
+                        <label for="post-title" class="block text-sm font-medium text-smart-gray">Title</label>
+                        <input type="text" id="post-title" required
+                            class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg focus:ring-smart-green focus:border-smart-green bg-card-background-light dark:bg-gray-700 text-text-light dark:text-text-dark">
+
+                        <label for="post-category" class="block text-sm font-medium text-smart-gray">Category</label>
+                        <select id="post-category" required
+                            class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg focus:ring-smart-green focus:border-smart-green bg-card-background-light dark:bg-gray-700 text-text-light dark:text-text-dark">
+                            <option value="news">News & Updates</option>
+                            <option value="tips">Tips & How-To</option>
+                            <option value="community">Community Stories</option>
+                            <option value="event">Event Alert</option>
+                        </select>
+
+                        <label for="post-content" class="block text-sm font-medium text-smart-gray">Main Content /
+                            Body</label>
+                        <textarea id="post-content" rows="10" required
+                            class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg focus:ring-smart-green focus:border-smart-green bg-card-background-light dark:bg-gray-700 text-text-light dark:text-text-dark"></textarea>
+
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-smart-gray">Publication Method</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="publish_type" value="new" checked
+                                        class="form-radio text-smart-green h-4 w-4">
+                                    <span class="ml-2 text-sm">New Content</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="publish_type" value="link"
+                                        class="form-radio text-smart-green h-4 w-4">
+                                    <span class="ml-2 text-sm">External Link</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="publish_type" value="draft"
+                                        class="form-radio text-smart-yellow h-4 w-4">
+                                    <span class="ml-2 text-sm">Save as Draft</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="external-link-section" class="hidden">
+                            <label for="external-url" class="block text-sm font-medium text-smart-gray">External
+                                URL</label>
+                            <input type="url" id="external-url"
+                                class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg focus:ring-smart-red focus:border-smart-red bg-card-background-light dark:bg-gray-700 text-text-light dark:text-text-dark">
+                        </div>
+
+<div id="image-upload-section">
+
+<label class="block text-sm font-medium text-smart-gray">
+Upload Blog Image
+</label>
+
+<input
+type="file"
+id="post-image"
+accept="image/*"
+class="w-full px-4 py-2 border border-border-light dark:border-border-dark rounded-lg bg-card-background-light dark:bg-gray-700 text-text-light dark:text-text-dark"
+/>
+
+</div>
+                        <p id="post-status-message" class="text-center text-sm font-medium mt-4"></p>
+
+                        <div
+                            class="flex justify-between space-x-2 pt-4 border-t border-border-light dark:border-border-dark">
+                            <button type="button" id="clear-form-btn"
+                                class="bg-gray-300 text-smart-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-400 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300 transition-colors text-sm">Clear</button>
+                            <button type="submit"
+                                class="bg-smart-green text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors text-sm">Publish
+                                Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Custom Delete Confirmation Modal (Replaces browser confirm) -->
+    <div id="delete-confirmation-modal"
+        class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[1000] hidden">
+        <div class="modal-content card max-w-sm w-full p-6 relative text-center">
+            <h3 class="text-xl font-bold modal-header mb-3 text-smart-dark dark:text-text-light">Confirm Deletion</h3>
+            <p class="text-smart-gray dark:text-gray-400 mb-6">
+                Are you sure you want to delete the post titled:
+                <span id="delete-post-title" class="font-bold text-smart-dark dark:text-text-light block mt-1"></span>
+                This action is permanent.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancel-delete-btn"
+                    class="bg-gray-300 text-smart-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-400 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300 transition-colors">Cancel</button>
+                <button id="confirm-delete-btn"
+                    class="bg-smart-red text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">Yes,
+                    Delete Post</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // JS LOGIC FOR BLOG MANAGEMENT
+        document.addEventListener('DOMContentLoaded', () => {
+            if(!localStorage.getItem("token")){
+    alert("Please login as admin first");
+    window.location.href = "admin_login.html";
+}
+            const blogForm = document.getElementById('blog-post-form');
+            const postTitleInput = document.getElementById('post-title');
+            const postContentTextarea = document.getElementById('post-content');
+            const postCategorySelect = document.getElementById('post-category');
+            const externalUrlInput = document.getElementById('external-url');
+            const externalLinkSection = document.getElementById('external-link-section');
+            const publishTypeRadios = document.querySelectorAll('input[name="publish_type"]');
+            const clearFormBtn = document.getElementById('clear-form-btn');
+            const postStatusMessage = document.getElementById('post-status-message');
+            const postCountHeader = document.getElementById('post-count-header');
+            const blogTableBody = document.getElementById('blog-table-body');
+
+            const deleteModal = document.getElementById('delete-confirmation-modal');
+            const deletePostTitleSpan = document.getElementById('delete-post-title');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+
+            let currentPosts = [];
+            let isEditing = false;
+            let editPostId = null;
+
+            // --- Utility Functions ---
+
+            const renderTable = () => {
+                blogTableBody.innerHTML = '';
+                postCountHeader.textContent = `Existing Posts (${currentPosts.length})`;
+
+                currentPosts.forEach(post => {
+                    const row = blogTableBody.insertRow();
+                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200';
+                    row.dataset.id = post.id;
+                    row.dataset.status = post.status;
+                    row.dataset.title = post.title;
+
+                    const statusClass = post.status === 'Published' ? 'status-published' : 'status-draft';
+                    let categoryClass = "text-smart-green";
+
+if(post.category === "News & Updates"){
+    categoryClass = "text-smart-blue";
+}
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-4 max-w-xs truncate font-medium">${post.title}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm ${categoryClass}">${post.category}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-smart-gray">${post.date}</td>
+                        <td class="px-4 py-4 whitespace-nowrap"><span class="${statusClass}">${post.status}</span></td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm space-x-2">
+                            <button type="button" class="text-smart-blue hover:text-blue-700 font-medium edit-blog-btn" data-id="${post.id}">Edit</button>
+                            <button type="button" class="text-smart-red hover:text-red-700 font-medium remove-blog-btn" data-id="${post.id}">Remove</button>
+                        </td>
+                    `;
+                });
+            };
+
+            const clearForm = () => {
+                blogForm.reset();
+                isEditing = false;
+                editPostId = null;
+                externalLinkSection.classList.add('hidden');
+                postStatusMessage.textContent = '';
+                document.getElementById('post-panel-header').textContent = 'Create New Post';
+                blogForm.querySelector('button[type="submit"]').textContent = 'Publish Post';
+            };
+
+            const populateFormForEdit = (id) => {
+                const post = currentPosts.find(p => p.id === id);
+                if (!post) return;
+
+                isEditing = true;
+                editPostId = id;
+                
+                document.getElementById('post-panel-header').textContent = `Editing: ${post.title}`;
+                blogForm.querySelector('button[type="submit"]').textContent = 'Update Post';
+
+                postTitleInput.value = post.title;
+                postContentTextarea.value = post.content || '';
+                if(post.category === "News & Updates"){
+    postCategorySelect.value = "news";
+}
+else if(post.category === "Tips & How-To"){
+    postCategorySelect.value = "tips";
+}
+else if(post.category === "Community Stories"){
+postCategorySelect.value = "community";
+}
+else if(post.category === "Event Alert"){
+    postCategorySelect.value = "event";
+}
+                
+                // Handle link vs content radio selection
+                const isExternalLink = post.link && post.link.length > 0;
+                
+                if (post.status === 'Draft') {
+                    document.querySelector('input[name="publish_type"][value="draft"]').checked = true;
+                } else if (isExternalLink) {
+                    document.querySelector('input[name="publish_type"][value="link"]').checked = true;
+                    externalLinkSection.classList.remove('hidden');
+                    externalUrlInput.value = post.link;
+                } else {
+                    document.querySelector('input[name="publish_type"][value="new"]').checked = true;
+                    externalLinkSection.classList.add('hidden');
+                }
+            };
+            
+            // --- Event Handlers ---
+            
+            // Toggle External Link input based on radio selection
+            const imageUploadSection = document.getElementById("image-upload-section");
+
+publishTypeRadios.forEach(radio => {
+
+    radio.addEventListener("change", () => {
+
+        if (radio.value === "link") {
+
+            externalLinkSection.classList.remove("hidden");
+            imageUploadSection.classList.add("hidden");
+            postContentTextarea.required = false;
+
+        } 
+        else if (radio.value === "new") {
+
+            externalLinkSection.classList.add("hidden");
+            imageUploadSection.classList.remove("hidden");
+            postContentTextarea.required = true;
+
+        } 
+        else {
+
+            externalLinkSection.classList.add("hidden");
+            imageUploadSection.classList.add("hidden");
+
+        }
+
+    });
+
+});
+
+            // Handle Form Submission (Publish/Update)
+            blogForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const statusType = document.querySelector('input[name="publish_type"]:checked').value;
+    const newStatus = (statusType === 'draft') ? 'Draft' : 'Published';
+    const externalLink = (statusType === 'link') ? externalUrlInput.value : '';
+
+    const formData = new FormData();
+
+formData.append("title", postTitleInput.value);
+formData.append("category", postCategorySelect.options[postCategorySelect.selectedIndex].text);
+formData.append("content", postContentTextarea.value);
+formData.append("status", newStatus);
+formData.append("link", externalLink);
+
+const imageFile = document.getElementById("post-image").files[0];
+
+if(imageFile){
+    formData.append("image", imageFile);
+}
+
+    try {
+
+        let res;
+
+if (isEditing) {
+
+    res = await fetch(`https://novomesh-backend.onrender.com/api/admin/blogs/${editPostId}`, {
+    method: "PUT",
+    headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+    },
+    body: formData
+});
+
+} else {
+
+    res = await fetch("https://novomesh-backend.onrender.com/api/admin/blogs", {
+    method: "POST",
+    headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+    },
+    body: formData
+});
+
+}
+
+        if(!res.ok){
+    const err = await res.json();
+    throw new Error(err.error || "Request failed");
+}
+
+const data = await res.json();
+
+        postStatusMessage.textContent = isEditing 
+    ? "Post updated successfully!" 
+    : "Post published successfully!";
+        postStatusMessage.className = "text-center text-sm font-bold text-smart-green mt-4";
+
+        clearForm();
+        loadBlogs();
+
+    } catch (err) {
+    console.error("BLOG ERROR:", err);
+
+    postStatusMessage.textContent = err.message;
+}
+});
+            
+            // Clear Form Button
+            clearFormBtn.addEventListener('click', clearForm);
+
+
+            // --- Modal and Delegation for Table Actions ---
+            blogTableBody.addEventListener('click', (e) => {
+    const target = e.target;
+    const postId = target.dataset.id;
+
+                if (target.classList.contains('edit-blog-btn')) {
+                    populateFormForEdit(postId);
+                    // Scroll to form panel when editing starts on mobile
+                    document.querySelector('.sticky').scrollIntoView({ behavior: 'smooth' });
+                } else if (target.classList.contains('remove-blog-btn')) {
+
+    console.log("Remove button clicked", target.dataset.id);
+
+    const post = currentPosts.find(p => p.id === postId);
+
+    if (post) {
+        deleteModal.dataset.postId = postId;
+        deletePostTitleSpan.textContent = post.title;
+        deleteModal.classList.remove('hidden');
+    }
+}
+            });
+
+            confirmDeleteBtn.addEventListener('click', async () => {
+
+    const postId = deleteModal.dataset.postId;
+
+    try {
+
+        const res = await fetch(`https://novomesh-backend.onrender.com/api/admin/blogs/${postId}`, {
+    method: "DELETE",
+    headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+    }
+});
+
+        if(!res.ok){
+            throw new Error("Delete failed");
+        }
+
+        deleteModal.classList.add('hidden');
+
+        // ⭐ Show success message
+        postStatusMessage.textContent = "Post deleted successfully!";
+        postStatusMessage.className = "text-center text-sm font-bold text-smart-green mt-4";
+
+        // reload blogs
+        loadBlogs();
+
+        // optional: auto hide message
+        setTimeout(() => {
+            postStatusMessage.textContent = "";
+        }, 3000);
+
+    } catch (err) {
+
+        console.error("Delete error:", err);
+
+        postStatusMessage.textContent = "Failed to delete post";
+        postStatusMessage.className = "text-center text-sm font-bold text-smart-red mt-4";
+
+    }
+
+});
+
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteModal.classList.add('hidden');
+            });
+
+            async function loadBlogs() {
+    try {
+
+        const res = await fetch("https://novomesh-backend.onrender.com/api/admin/blogs", {
+    headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+    }
+});
+        if(!res.ok){
+    throw new Error("Failed to fetch blogs");
+}
+
+const data = await res.json();
+
+        currentPosts = data.map(post => ({
+            id: post.id,
+            title: post.title,
+            category: post.category,
+            date: new Date(post.created_at).toLocaleDateString(),
+            status: post.status,
+            content: post.content,
+            link: post.external_link
+        }));
+
+        renderTable();   // ⭐ THIS WAS MISSING
+
+    } catch (err) {
+        console.error("Failed to load blogs:", err);
+    }
+}
+
+            // --- Initial Load ---
+           loadBlogs();
+            
+            // SIDEBAR TOGGLE LOGIC (Copied from Dashboard)
+            const sidebar = document.getElementById('sidebar');
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            const body = document.body;
+    
+            const toggleSidebar = () => {
+                if (window.innerWidth < 1024) {
+                    const isOpen = sidebar.classList.toggle('-translate-x-full');
+                    sidebarBackdrop.classList.toggle('hidden', isOpen);
+                    body.classList.toggle('overflow-hidden', !isOpen);
+                }
+            };
+    
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', () => {
+                    toggleSidebar();
+                });
+            }
+            if (sidebarBackdrop) {
+                sidebarBackdrop.addEventListener('click', toggleSidebar);
+            }
+            
+            const adminLogoutLink = document.getElementById('admin-logout-link');
+            if (adminLogoutLink) {
+                adminLogoutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('driverToken');
+                    localStorage.removeItem('driver');
+                    window.location.href = 'index.html';
+                });
+            }
+    
+sidebar.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) {
+                        toggleSidebar();
+                    }
+                });
+            });
+        });
+    </script>
+    
+
+</body>
+
+</html>

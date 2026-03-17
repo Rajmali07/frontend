@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Details - Citizen Dashboard</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Font (Roboto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Configure Tailwind (Same as other pages) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': '#28a745', // Main green
+                        'smart-green-light': '#dcfce7', // Lighter green
+                        'smart-blue': '#17a2b8',  // Admin blue
+                        'smart-blue-light': '#d4f0f5', // Lighter blue
+                        'smart-yellow': '#ffc107', // Driver yellow
+                        'smart-dark': '#333333',   // Footer/text dark
+                        'smart-gray': '#6c757d',   // Subtext gray
+                        'smart-red': '#dc3545', // Error red
+                        'smart-red-light': '#fdebec', // Light error red
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'header': '0 2px 6px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.1)',
+                        'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+                        'top': '0 -2px 6px rgba(0,0,0,0.1)', // For bottom nav
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa; /* A light gray background */
+        }
+        
+        /* Timeline specific styles (same as track page) */
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+            padding-left: 2.5rem;
+            border-left: 2px solid #e5e7eb; /* gray-200 */
+        }
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+            padding-bottom: 0;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -0.6rem;
+            top: 0.1rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .timeline-dot-green { background-color: #28a745; }
+        .timeline-dot-yellow { background-color: #ffc107; }
+        .timeline-dot-gray { background-color: #e5e7eb; }
+
+    </style>
+</head>
+<body class="font-roboto text-smart-dark antialiased">
+
+    <!-- Dashboard Header (Fixed Top Bar) -->
+    <header class="bg-white shadow-header fixed top-0 left-0 right-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <!-- Logo & Title -->
+            <a href="citizen_dashboard.html" class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-green">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span class="text-xl font-bold text-smart-green hidden sm:block">Citizen Portal</span>
+            </a>
+            
+            <!-- Profile Dropdown -->
+            <div class="relative">
+                <button id="profile-btn" class="flex items-center space-x-2 focus:outline-none">
+                    <span id="citizen-name" class="text-smart-dark font-medium hidden md:block">Hello!</span>
+                    <img class="w-10 h-10 rounded-full object-cover border-2 border-smart-green" src="https://placehold.co/100x100/EAF7E8/28a745?text=A" alt="Profile Picture">
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 hidden">
+                    <a href="citizen_profile.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">View Profile</a>
+                    <a href="citizen_settings.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">Settings</a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="index.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <!-- Added pt-16 for fixed header and pb-20 for fixed bottom nav -->
+    <main class="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+        
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="citizen_report_history.html" class="flex items-center text-sm text-smart-green font-medium hover:underline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Back to Report History
+            </a>
+        </div>
+        
+        <!-- Complaint Details Section -->
+        <section id="complaint-details" class="bg-white p-6 md:p-8 rounded-2xl shadow-card">
+            
+            <!-- Header -->
+            <div class="border-b border-gray-200 pb-4 mb-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center">
+                    <div>
+                        <p class="text-sm text-smart-gray">Complaint ID</p>
+                        <h1 id="result-id" class="text-3xl font-bold text-smart-dark">#WMC-8349</h1>
+                    </div>
+                    <div class="mt-2 sm:mt-0">
+                        <p class="text-sm text-smart-gray">Current Status</p>
+                        <span id="result-status-badge" class="px-3 py-1 text-base font-bold text-smart-yellow bg-yellow-100 rounded-full">In Progress</span>
+                    </div>
+                </div>
+                <p id="result-description" class="text-xl text-smart-gray mt-2">Bin Overflow - Main Street Park</p>
+            </div>
+
+            <!-- Grid for Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+                <!-- Left: Photo & Map -->
+                <div class="space-y-6">
+                    <!-- Submitted Photo -->
+                    <div>
+                        <h3 class="text-lg font-bold text-smart-dark mb-2">Submitted Photo</h3>
+                        <div id="photo-container" class="rounded-lg overflow-hidden bg-gray-100 min-h-[200px] flex items-center justify-center">
+                            <!-- Image or placeholder will be injected here -->
+                        </div>
+                    </div>
+                    <!-- Location Map -->
+                    <div>
+                        <h3 class="text-lg font-bold text-smart-dark mb-2">Location</h3>
+                        <div id="map-container" class="rounded-lg overflow-hidden h-64 bg-gray-200 flex items-center justify-center">
+                            <!-- Map placeholder will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Status Timeline -->
+                <div>
+                    <h3 class="text-lg font-bold text-smart-dark mb-6">Status History</h3>
+                    <div id="timeline-container">
+                        <!-- Timeline items will be injected here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Loading / Error States -->
+        <section id="loading-message" class="hidden text-center p-6 bg-white rounded-2xl shadow-card mt-8">
+            <p class="text-lg text-smart-gray">Loading complaint details...</p>
+        </section>
+
+        <section id="error-message" class="hidden p-6 bg-smart-red-light text-smart-red font-medium rounded-2xl shadow-card text-center mt-8">
+            <p><strong>Complaint Not Found.</strong></p>
+            <p>The complaint ID in the URL is not valid or does not exist.</p>
+        </section>
+
+    </main>
+
+    <!-- Fixed Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-top z-40 h-16 flex justify-around items-center md:hidden">
+        <a href="citizen_dashboard.html" class="flex flex-col items-center text-smart-gray hover:text-smart-green p-2">
+            <!-- Home Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span class="text-xs font-medium">Home</span>
+        </a>
+        <a href="citizen_report_bin.html" class="flex flex-col items-center text-smart-gray hover:text-smart-green p-2">
+            <!-- Report Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span class="text-xs font-medium">Report</span>
+        </a>
+        <a href="citizen_report_history.html" class="flex flex-col items-center text-smart-green p-2">
+            <!-- History Icon (Active) -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            <span class="text-xs font-medium">History</span>
+        </a>
+        <a href="citizen_profile.html" class="flex flex-col items-center text-smart-gray hover:text-smart-green p-2">
+            <!-- Profile Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span class="text-xs font-medium">Profile</span>
+        </a>
+    </nav>
+    
+    <!-- JavaScript for Interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Element References ---
+            const profileBtn = document.getElementById('profile-btn');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            const complaintDetailsSection = document.getElementById('complaint-details');
+            const loadingMessage = document.getElementById('loading-message');
+            const errorMessage = document.getElementById('error-message');
+            
+            const resultId = document.getElementById('result-id');
+            const resultStatusBadge = document.getElementById('result-status-badge');
+            const resultDescription = document.getElementById('result-description');
+            const photoContainer = document.getElementById('photo-container');
+            const mapContainer = document.getElementById('map-container');
+            const timelineContainer = document.getElementById('timeline-container');
+
+            // --- Mock Data ---
+            const mockComplaints = {
+                "C-1024": {
+                    id: "#C-1024",
+                    description: "Bin Overflow - Sector 12 Park",
+                    status: "In Progress",
+                    badgeClass: "text-smart-yellow bg-yellow-100",
+                    photoUrl: "https://placehold.co/600x400/FDEBEC/dc3545?text=Bin+Sector+12",
+                    location: {
+                        lat: 22.0900,
+                        lon: 82.1500,
+                        address: "Sector 12 Park"
+                    },
+                    timeline: [
+                        { status: "Report Submitted", date: "Oct 27, 2025 - 09:00 AM", details: "Complaint and photo received.", state: "complete" },
+                        { status: "AI Verified", date: "Oct 27, 2025 - 09:01 AM", details: "AI confirmed the bin is full.", state: "complete" },
+                        { status: "Assigned to Driver", date: "Oct 27, 2025 - 09:30 AM", details: "Driver Ram Singh (DL-04-TRUCK) assigned for pickup.", state: "active" },
+                        { status: "Resolved", date: "Pending", details: "Bin will be cleared shortly.", state: "pending" }
+                    ]
+                },
+                "C-1023": {
+                    id: "#C-1023",
+                    description: "Drainage Blockage - Main St",
+                    status: "Resolved",
+                    badgeClass: "text-smart-green bg-smart-green-light",
+                    photoUrl: "https://placehold.co/600x400/D4F0F5/17a2b8?text=Drainage+Blockage",
+                    location: {
+                        lat: 22.0780,
+                        lon: 82.1410,
+                        address: "Main St, Near Bakery"
+                    },
+                    timeline: [
+                        { status: "Report Submitted", date: "Oct 26, 2025 - 11:00 AM", details: "Complaint received.", state: "complete" },
+                        { status: "Assigned to Civic Dept.", date: "Oct 26, 2025 - 11:30 AM", details: "Forwarded to sanitation.", state: "complete" },
+                        { status: "Work In Progress", date: "Oct 26, 2025 - 02:00 PM", details: "Team dispatched.", state: "complete" },
+                        { status: "Resolved", date: "Oct 26, 2025 - 05:00 PM", details: "Blockage cleared. Thank you!", state: "complete" }
+                    ]
+                },
+                "C-1022": {
+                    id: "#C-1022",
+                    description: "Garbage Dump - Lane 3",
+                    status: "Resolved",
+                    badgeClass: "text-smart-green bg-smart-green-light",
+                    photoUrl: "https://placehold.co/600x400/E0E0E0/9E9E9E?text=Garbage+Dump",
+                    location: {
+                        lat: 22.0760,
+                        lon: 82.1390,
+                        address: "Lane 3, Greenfield Area"
+                    },
+                    timeline: [
+                        { status: "Report Submitted", date: "Oct 25, 2025 - 01:00 PM", details: "Complaint and photo received.", state: "complete" },
+                        { status: "AI Verified", date: "Oct 25, 2025 - 01:01 PM", details: "AI confirmed illegal dumping.", state: "complete" },
+                        { status: "Assigned to Driver", date: "Oct 25, 2025 - 01:30 PM", details: "Driver Priya Sharma (DL-02-TRUCK) assigned.", state: "complete" },
+                        { status: "Resolved", date: "Oct 25, 2025 - 04:00 PM", details: "Garbage cleared. Thank you!", state: "complete" }
+                    ]
+                }
+            };
+
+            // --- Helper Functions ---
+            
+            /** Renders all details for a given complaint object. */
+            function renderComplaintDetails(complaint) {
+                // Set header
+                resultId.textContent = complaint.id;
+                resultDescription.textContent = complaint.description;
+                
+                // Set badge
+                resultStatusBadge.textContent = complaint.status;
+                resultStatusBadge.className = `px-3 py-1 text-base font-bold rounded-full ${complaint.badgeClass}`;
+
+                // Set Photo
+                if (complaint.photoUrl) {
+                    photoContainer.innerHTML = `<img src="${complaint.photoUrl}" alt="Submitted photo for ${complaint.id}" class="w-full h-full object-cover">`;
+                } else {
+                    photoContainer.innerHTML = `<p class="text-smart-gray">No photo was submitted for this complaint.</p>`;
+                }
+                
+                // Set Map
+                const { lat, lon, address } = complaint.location;
+                // Using a static placeholder as we don't have a Google Maps API key
+                const mapImgUrl = `https://placehold.co/600x400/EAF7E8/28a745?text=Location:+${address.replace(' ', '+')}`;
+                mapContainer.innerHTML = `
+                    <div class="w-full h-full">
+                        <img src="${mapImgUrl}" alt="Map view of ${address}" class="w-full h-full object-cover">
+                        <p class="text-sm text-smart-dark bg-white p-2 relative bottom-10 left-2 rounded shadow">
+                            <strong>${address}</strong>
+                        </p>
+                    </div>
+                `;
+
+                // Build timeline HTML
+                timelineContainer.innerHTML = ''; // Clear previous results
+                complaint.timeline.forEach(item => {
+                    let dotClass = 'timeline-dot-gray';
+                    if (item.state === 'complete') dotClass = 'timeline-dot-green';
+                    if (item.state === 'active') dotClass = 'timeline-dot-yellow';
+
+                    const itemHtml = `
+                        <div class="timeline-item">
+                            <span class="timeline-dot ${dotClass}"></span>
+                            <p class="font-bold text-smart-dark">${item.status}</p>
+                            <p class="text-sm text-smart-gray">${item.date}</p>
+                            <p class="text-sm text-smart-dark mt-1">${item.details}</p>
+                        </div>
+                    `;
+                    timelineContainer.innerHTML += itemHtml;
+                });
+            }
+
+            /** Loads the complaint data based on URL parameter. */
+            function loadComplaint() {
+                complaintDetailsSection.classList.add('hidden');
+                loadingMessage.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const complaintId = urlParams.get('id');
+
+                // Simulate network request
+                setTimeout(() => {
+                    loadingMessage.classList.add('hidden');
+                    let foundComplaint = null;
+                    if (complaintId) {
+                        foundComplaint = mockComplaints[complaintId.toUpperCase()];
+                    }
+
+                    if (foundComplaint) {
+                        // Complaint found
+                        renderComplaintDetails(foundComplaint);
+                        complaintDetailsSection.classList.remove('hidden');
+                    } else {
+                        // Complaint not found
+                        errorMessage.classList.remove('hidden');
+                    }
+                }, 1000); // Simulate 1 second load
+            }
+
+
+            // --- Event Listeners ---
+
+            // 1. Profile Dropdown Toggle
+            profileBtn.addEventListener('click', () => {
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            window.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+            
+            // 2. Load complaint data on page load
+            loadComplaint();
+
+        });
+    </script>
+
+</body>
+</html>

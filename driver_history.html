@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver History - Clean City</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Font (Roboto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Configure Tailwind (Same as driver_dashboard) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': '#28a745', 
+                        'smart-green-light': '#dcfce7', 
+                        'smart-blue': '#17a2b8',  
+                        'smart-blue-light': '#d4f0f5', 
+                        'smart-yellow': '#ffc107', 
+                        'smart-yellow-light': '#fffbeb', 
+                        'smart-dark': '#333333',   
+                        'smart-gray': '#6c757d',   
+                        'smart-red': '#dc3545', 
+                        'smart-red-light': '#fdebec', 
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'header': '0 2px 6px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.1)',
+                        'card-hover': '0 8px 24px rgba(0,0,0,0.15)',
+                        'top': '0 -2px 6px rgba(0,0,0,0.1)', 
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa; /* A light gray background */
+        }
+        /* Accordion styles */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: 500px; /* Adjust as needed */
+            transition: max-height 0.5s ease-in;
+        }
+        .accordion-button svg {
+             transition: transform 0.3s ease;
+        }
+         .accordion-item.open .accordion-button svg {
+             transform: rotate(180deg);
+         }
+    </style>
+</head>
+<body class="font-roboto text-smart-dark antialiased">
+
+    <!-- Dashboard Header (Fixed Top Bar) -->
+    <header class="bg-white shadow-header fixed top-0 left-0 right-0 z-40 h-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
+            <!-- Logo & Title -->
+             <a href="index.html" class="flex items-center space-x-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-yellow">
+                      <rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle>
+                 </svg>
+                 <span class="text-xl font-bold text-smart-yellow hidden sm:block">Driver Portal</span>
+             </a>
+            
+            <!-- Profile Dropdown -->
+            <div class="relative">
+                <button id="profile-btn" class="flex items-center space-x-2 focus:outline-none">
+                    <span class="text-smart-dark font-medium hidden md:block">Hello, Ram Singh!</span>
+                    <!-- Driver Profile Pic -->
+                    <img class="w-10 h-10 rounded-full object-cover border-2 border-smart-yellow" src="https://placehold.co/100x100/FFFBEB/ffc107?text=R" alt="Driver Profile Picture">
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 hidden">
+                    <a href="driver_profile.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">View Profile</a> 
+                    <a href="driver_settings.html" class="block px-4 py-2 text-sm text-smart-dark hover:bg-gray-100">Settings</a> 
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="index.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <!-- Added pt-16 for fixed header and pb-20 for fixed bottom nav -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
+        
+        <h1 class="text-3xl font-bold text-smart-dark mb-6">Completed Task History</h1>
+
+        <!-- History Filter (Optional - Example) -->
+        <div class="mb-6 flex flex-col sm:flex-row gap-4 items-center">
+             <label for="date-filter" class="text-sm font-medium text-smart-gray">Filter by Date:</label>
+             <input type="date" id="date-filter" class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-smart-yellow text-sm">
+             <button id="filter-btn" class="bg-smart-yellow text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-yellow-600 transition-colors text-sm">Apply</button>
+        </div>
+
+        <!-- History Accordion -->
+        <div id="history-accordion" class="space-y-4">
+            <!-- History items will be dynamically generated here -->
+            <!-- Example Structure (will be populated by JS) -->
+            <!-- 
+            <div class="accordion-group">
+                <h2 class="text-xl font-semibold text-smart-dark mb-2 sticky top-16 bg-gray-100 py-2 px-3 rounded -mx-3 z-10">October 27, 2025</h2>
+                <div class="accordion-item bg-white rounded-lg shadow-card border border-gray-200">
+                    <button class="accordion-button w-full flex justify-between items-center p-4 text-left">
+                        <div class="flex-grow">
+                             <span class="font-semibold text-smart-dark">#WMC-8301 - Near Sector 4 Market</span>
+                             <span class="text-xs text-smart-gray block">Completed: 03:45 PM</span>
+                        </div>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-gray flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="accordion-content border-t border-gray-100">
+                        <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                            <div>
+                                <h4 class="font-medium text-sm mb-1 text-smart-gray">Before Cleanup:</h4>
+                                <img src="https://placehold.co/300x200/FEE2E2/DC2626?text=Before+Image" alt="Before Cleanup" class="rounded-md w-full h-auto object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-sm mb-1 text-smart-gray">After Cleanup (AI Verified):</h4>
+                                <img src="https://placehold.co/300x200/DCFCE7/16A34A?text=After+Image+(Verified)" alt="After Cleanup" class="rounded-md w-full h-auto object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 -- More items for the same date --
+            </div>
+             -- More date groups --
+            -->
+        </div>
+
+    </main>
+
+    <!-- Fixed Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-top z-40 h-16 flex justify-around items-center md:hidden">
+        <a href="driver_dashboard.html" class="flex flex-col items-center text-smart-gray hover:text-smart-yellow p-2"> 
+            <!-- Dashboard Icon -->
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span class="text-xs font-medium">Dashboard</span>
+        </a>
+        <a href="driver_route.html" class="flex flex-col items-center text-smart-gray hover:text-smart-yellow p-2"> 
+            <!-- Route/Map Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+            <span class="text-xs font-medium">Route</span>
+        </a>
+        <a href="driver_history.html" class="flex flex-col items-center text-smart-yellow p-2"> <!-- Active color yellow -->
+            <!-- History Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            <span class="text-xs font-medium">History</span>
+        </a>
+        <a href="driver_profile.html" class="flex flex-col items-center text-smart-gray hover:text-smart-yellow p-2"> 
+            <!-- Profile Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span class="text-xs font-medium">Profile</span>
+        </a>
+    </nav>
+
+    <!-- JavaScript for Interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Elements ---
+            const profileBtn = document.getElementById('profile-btn');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            const historyAccordion = document.getElementById('history-accordion');
+            const dateFilterInput = document.getElementById('date-filter');
+            const filterBtn = document.getElementById('filter-btn');
+
+            // --- Mock Task History Data ---
+            const historyData = [
+                 // Today (Oct 27, 2025 - Assuming current date)
+                { id: "WMC-8301", type: "Bin", location: "Near Sector 4 Market", date: "2025-10-27", completedTime: "03:45 PM", beforeImg: "https://placehold.co/300x200/FEE2E2/DC2626?text=Before+8301", afterImg: "https://placehold.co/300x200/DCFCE7/16A34A?text=After+8301+Verified" },
+                { id: "C-8305", type: "Civic", location: "Streetlight Out, Lane 2", date: "2025-10-27", completedTime: "11:15 AM", beforeImg: "https://placehold.co/300x200/FEF3C7/F59E0B?text=Streetlight+Issue", afterImg: "https://placehold.co/300x200/DBEAFE/2563EB?text=Streetlight+Fixed" },
+                // Yesterday (Oct 26, 2025)
+                { id: "WMC-8290", type: "Bin", location: "Community Hall Entrance", date: "2025-10-26", completedTime: "05:00 PM", beforeImg: "https://placehold.co/300x200/FEE2E2/DC2626?text=Before+8290", afterImg: "https://placehold.co/300x200/DCFCE7/16A34A?text=After+8290+Verified" },
+                { id: "WMC-8288", type: "Bin", location: "Park Corner, Sector 11", date: "2025-10-26", completedTime: "10:30 AM", beforeImg: "https://placehold.co/300x200/FEE2E2/DC2626?text=Before+8288", afterImg: "https://placehold.co/300x200/DCFCE7/16A34A?text=After+8288+Verified" },
+                 // Oct 25, 2025
+                 { id: "WMC-8275", type: "Bin", location: "Bus Stop, Main Road", date: "2025-10-25", completedTime: "01:20 PM", beforeImg: "https://placehold.co/300x200/FEE2E2/DC2626?text=Before+8275", afterImg: "https://placehold.co/300x200/DCFCE7/16A34A?text=After+8275+Verified" },
+            ];
+
+            // --- Functions ---
+
+            // Function to format date string (e.g., "October 27, 2025")
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', options); // Add T00:00:00 to avoid timezone issues
+            }
+
+            // Function to render history items
+            function renderHistory(data) {
+                historyAccordion.innerHTML = ''; // Clear previous items
+
+                // Group data by date
+                const groupedData = data.reduce((acc, task) => {
+                    const date = task.date;
+                    if (!acc[date]) {
+                        acc[date] = [];
+                    }
+                    acc[date].push(task);
+                    return acc;
+                }, {});
+
+                 // Sort dates descending (most recent first)
+                 const sortedDates = Object.keys(groupedData).sort((a, b) => new Date(b) - new Date(a));
+
+                if (sortedDates.length === 0) {
+                     historyAccordion.innerHTML = '<p class="text-center text-smart-gray italic">No completed tasks found for the selected date.</p>';
+                     return;
+                }
+
+                 sortedDates.forEach(date => {
+                     const tasksForDate = groupedData[date];
+                     
+                     const dateGroupDiv = document.createElement('div');
+                     dateGroupDiv.className = 'accordion-group';
+
+                     // Add date header (sticky)
+                     const dateHeader = document.createElement('h2');
+                     dateHeader.className = 'text-xl font-semibold text-smart-dark mb-2 sticky top-16 bg-gray-100 py-2 px-3 rounded -mx-3 z-10'; // Sticky header style
+                     dateHeader.textContent = formatDate(date);
+                     dateGroupDiv.appendChild(dateHeader);
+
+                     tasksForDate.forEach(task => {
+                         const itemDiv = document.createElement('div');
+                         itemDiv.className = 'accordion-item bg-white rounded-lg shadow-card border border-gray-200 overflow-hidden'; // Added overflow-hidden
+
+                         itemDiv.innerHTML = `
+                            <button class="accordion-button w-full flex justify-between items-center p-4 text-left hover:bg-gray-50 transition-colors">
+                                <div class="flex-grow mr-4">
+                                     <span class="font-semibold text-smart-dark">${task.id} - ${task.location}</span>
+                                     <span class="text-xs text-smart-gray block">Completed: ${task.completedTime}</span>
+                                </div>
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-smart-gray flex-shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div class="accordion-content border-t border-gray-100">
+                                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 items-start"> <!-- Changed items-center to items-start -->
+                                    <div>
+                                        <h4 class="font-medium text-sm mb-1 text-smart-gray">Before Cleanup:</h4>
+                                        <img src="${task.beforeImg}" alt="Before Cleanup ${task.id}" class="rounded-md w-full h-auto object-cover border">
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-sm mb-1 text-smart-gray">After Cleanup (AI Verified):</h4>
+                                        <img src="${task.afterImg}" alt="After Cleanup ${task.id}" class="rounded-md w-full h-auto object-cover border">
+                                    </div>
+                                </div>
+                            </div>
+                         `;
+                         dateGroupDiv.appendChild(itemDiv);
+                     });
+                     historyAccordion.appendChild(dateGroupDiv);
+                 });
+
+                 // Add event listeners for the newly created buttons
+                 addAccordionListeners();
+            }
+
+            // Function to add accordion toggle listeners
+            function addAccordionListeners() {
+                const accordionButtons = historyAccordion.querySelectorAll('.accordion-button');
+                accordionButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const item = button.closest('.accordion-item');
+                        item.classList.toggle('open');
+                    });
+                });
+            }
+
+             // Function to filter history data by date
+             function filterHistory() {
+                 const selectedDate = dateFilterInput.value;
+                 if (!selectedDate) {
+                     renderHistory(historyData); // Show all if no date selected
+                 } else {
+                     const filteredData = historyData.filter(task => task.date === selectedDate);
+                     renderHistory(filteredData);
+                 }
+             }
+
+            // --- Event Listeners ---
+            profileBtn.addEventListener('click', () => {
+                profileDropdown.classList.toggle('hidden');
+            });
+
+             window.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !profileDropdown?.contains(e.target)) { 
+                    profileDropdown?.classList.add('hidden'); 
+                }
+            });
+
+            filterBtn.addEventListener('click', filterHistory);
+            // Optional: Filter immediately when date changes
+            // dateFilterInput.addEventListener('change', filterHistory); 
+
+            // --- Initial Render ---
+            renderHistory(historyData); // Render all history initially
+
+        });
+    </script>
+
+</body>
+</html>

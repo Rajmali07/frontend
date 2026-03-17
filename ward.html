@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ward Management - Swach Raipur Admin</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        // Check local storage for 'dark' preference before loading CSS/JS
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (savedTheme === 'system' && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            // Inject minimal CSS to set dark background immediately
+            const style = document.createElement('style');
+            style.textContent = `
+                body { background-color: #1a202c !important; }
+                header, .card { background-color: #2d3748 !important; }
+                h2, p, span { color: #e2e8f0 !important; }
+            `;
+            document.head.appendChild(style);
+        }
+    </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'smart-green': 'var(--color-smart-green, #28a745)',
+                        'smart-green-dark': '#208135',
+                        'smart-blue': 'var(--color-smart-blue, #17a2b8)',
+                        'smart-yellow': 'var(--color-smart-yellow, #ffc107)',
+                        'smart-red': 'var(--color-smart-red, #dc3545)',
+                        'smart-dark': 'var(--color-smart-dark, #333333)',
+                        'smart-gray': 'var(--color-smart-gray, #6c757d)',
+                        'background-light': 'var(--color-background-light, #f8f9fa)',
+                        'card-background-light': 'var(--color-card-background-light, #ffffff)',
+                        'text-light': 'var(--color-text-light, #333333)',
+                        'border-light': 'var(--color-border-light, #e2e8f0)',
+                        'background-dark': 'var(--color-background-dark, #1a202c)',
+                        'card-background-dark': 'var(--color-card-background-dark, #2d3748)',
+                        'text-dark': 'var(--color-text-dark, #e2e8f0)',
+                    },
+                    fontFamily: { 'roboto': ['Roboto', 'sans-serif'], },
+                    boxShadow: { 'header': '0 2px 6px rgba(0,0,0,0.1)', 'card': '0 4px 12px rgba(0,0,0,0.08)', 'sidebar': '4px 0 15px rgba(0,0,0,0.1)',}
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- General Theme Variables --- */
+        :root {
+            --color-smart-green: #28a745;
+            --color-smart-blue: #17a2b8;
+            --color-smart-yellow: #ffc107;
+            --color-smart-red: #dc3545;
+            --color-smart-gray: #6c757d;
+            --color-background-light: #f8f9fa;
+            --color-card-background-light: #ffffff;
+            --color-text-light: #333333;
+            --color-border-light: #e2e8f0;
+            --sidebar-bg: #28a745; 
+            --sidebar-text: #ffffff;
+            --sidebar-hover-bg: #208135; 
+            --sidebar-active-bg: #208135; 
+        }
+
+        .dark {
+            --color-background-light: #1a202c;
+            --color-card-background-light: #2d3748;
+            --color-text-light: #e2e8f0;
+            --color-border-light: #4a5568;
+            --sidebar-bg: #1a472a; 
+            --sidebar-hover-bg: #208135;
+            --sidebar-active-bg: #208135;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--color-background-light);
+            color: var(--color-text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            box-shadow: var(--tw-shadow-sidebar);
+        }
+        .sidebar-link {
+            transition: background-color 0.2s, color 0.2s;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-link:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-text);
+        }
+        /* Active state for the specific page being viewed */
+        .sidebar-link.active {
+             background-color: var(--sidebar-active-bg);
+            font-weight: 700;
+            color: var(--sidebar-text);
+        }
+
+        .sidebar-footer-link:hover {
+            color: #ffc107;
+            text-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+        }
+
+        /* Generic card styling for consistency */
+        .card {
+            background-color: var(--color-card-background-light);
+            border-radius: 0.75rem;
+            box-shadow: var(--tw-shadow-card, 0 4px 12px rgba(0, 0, 0, 0.08));
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease;
+            color: var(--color-text-light);
+        }
+
+        /* Ward/Zone Card Styling */
+        .zone-card-wrapper {
+            margin-bottom: 1rem; 
+        }
+        .zone-card-wrapper:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        .ward-item {
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ward-item:hover .ward-item-content {
+            transform: translateX(5px);
+            color: var(--color-smart-blue);
+        }
+
+        /* Modal Styles */
+        .modal {
+            background-color: var(--color-card-background-light);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .ward-detail-modal {
+            max-width: 500px;
+        }
+        .draggable-zone {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--color-border-light);
+            border-radius: 0.5rem;
+            background-color: var(--color-background-light);
+            cursor: grab;
+        }
+        .draggable-zone:hover {
+            background-color: var(--color-card-background-light);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body class="font-roboto antialiased flex min-h-screen">
+
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden"></div>
+
+    <aside id="sidebar" class="sidebar fixed top-0 bottom-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+        
+        <div class="p-6 flex items-center space-x-3 flex-shrink-0">
+            <img src="assets/logo/swachchh_raipur.svg" alt="Swach Raipur Logo" class="h-10 w-auto rounded-lg">
+            <div>
+                <h1 class="text-xl font-bold text-white leading-tight">Swach Raipur</h1>
+                <p class="text-sm font-light text-green-100 leading-tight">Admin Panel</p>
+            </div>
+        </div>
+
+        <nav class="flex-grow space-y-2 p-4 pt-6 text-base">
+            <a href="admin_dashboard.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="zones.html" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>Zones</span>
+            </a>
+            <a href="admin_task_review.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>Task Review</span>
+            </a>
+            <a href="admin_user_management.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                <span>Driver Management</span>
+            </a>
+            <a href="admin_feedback.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Feedback</span>
+            </a>
+            <a href="admin_blogs.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="11" x2="15" y2="11"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>
+                <span>Blog</span>
+            </a>
+             <a href="analytics.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4"></path><polyline points="17 9 12 4 7 9"></polyline><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                <span>Analytics</span>
+            </a>
+            <a href="profile.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </a>
+            <a href="admin_settings.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09z"></path></svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-6 flex-shrink-0 border-t border-green-700">
+            <a href="index.html" id="admin-logout-link" class="sidebar-footer-link flex items-center justify-center space-x-2 p-3 rounded-lg text-yellow-300 font-semibold transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span class="text-sm">LOGOUT</span>
+            </a>
+        </div>
+    </aside>
+
+    <header class="bg-white dark:bg-card-background-light shadow-header fixed top-0 left-0 right-0 z-40 h-16 transition-colors duration-300 lg:hidden">
+        <div class="container mx-auto px-4 sm:px-6 flex justify-between items-center h-full">
+            <a href="admin_dashboard.html" class="flex items-center space-x-2">
+                <img src="assets/logo/swachchh_raipur.svg" alt="Logo" class="h-10 w-auto">
+                <span class="text-xl font-bold text-smart-dark dark:text-text-light">Wards</span>
+            </a>
+            <button id="hamburger-btn" class="text-smart-dark dark:text-text-light p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-smart-green transition-colors duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="lg:ml-[280px] flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-8 pb-12 transition-colors duration-300">
+        
+        <section class="mb-6 flex justify-between items-end">
+            <h1 class="text-3xl font-bold text-smart-dark dark:text-text-dark">Ward Management: <span id="zone-display" class="text-smart-blue dark:text-smart-blue text-4xl font-extrabold leading-none"></span></h1>
+            <div class="flex space-x-3 mt-2 sm:mt-0">
+                <button id="add-ward-btn" class="bg-smart-green text-white font-medium py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Add Ward</span>
+                </button>
+                <button id="edit-wards-trigger" class="bg-smart-yellow text-white font-medium py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                    <span>Edit Wards</span>
+                </button>
+                <a href="admin_map_operations.html" class="bg-smart-blue text-white font-medium py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>View Map</span>
+                </a>
+            </div>
+        </section>
+
+        <div id="ward-list-container" class="space-y-4">
+            
+            <div class="card p-4 zone-card-wrapper ward-card-trigger" data-ward="Ward 1" data-dustbins="45" data-complaints="12" data-drivers="3" data-municipality="Raipur Nagar Nigam">
+                <div class="ward-item flex justify-between items-center">
+                    <span class="ward-item-content text-xl font-medium">Ward 1</span>
+                    <span class="text-smart-gray text-sm">Tap for Details &rarr;</span>
+                </div>
+            </div>
+
+            <div class="card p-4 zone-card-wrapper ward-card-trigger" data-ward="Ward 2" data-dustbins="60" data-complaints="5" data-drivers="4" data-municipality="Raipur Nagar Nigam">
+                <div class="ward-item flex justify-between items-center">
+                    <span class="ward-item-content text-xl font-medium">Ward 2</span>
+                    <span class="text-smart-gray text-sm">Tap for Details &rarr;</span>
+                </div>
+            </div>
+
+            <div class="card p-4 zone-card-wrapper ward-card-trigger" data-ward="Ward 3" data-dustbins="30" data-complaints="21" data-drivers="2" data-municipality="Raipur Nagar Nigam">
+                <div class="ward-item flex justify-between items-center">
+                    <span class="ward-item-content text-xl font-medium">Ward 3</span>
+                    <span class="text-smart-gray text-sm">Tap for Details &rarr;</span>
+                </div>
+            </div>
+
+            <div class="card p-4 zone-card-wrapper ward-card-trigger" data-ward="Ward 4" data-dustbins="55" data-complaints="8" data-drivers="3" data-municipality="Raipur Nagar Nigam">
+                <div class="ward-item flex justify-between items-center">
+                    <span class="ward-item-content text-xl font-medium">Ward 4</span>
+                    <span class="text-smart-gray text-sm">Tap for Details &rarr;</span>
+                </div>
+            </div>
+            
+            <div class="card p-4 zone-card-wrapper ward-card-trigger" data-ward="Ward 5" data-dustbins="20" data-complaints="15" data-drivers="1" data-municipality="Raipur Nagar Nigam">
+                <div class="ward-item flex justify-between items-center">
+                    <span class="ward-item-content text-xl font-medium">Ward 5</span>
+                    <span class="text-smart-gray text-sm">Tap for Details &rarr;</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+    
+    <div id="ward-detail-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[1000] hidden">
+        <div class="modal ward-detail-modal rounded-xl p-8 transform transition-all">
+            <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pb-3 mb-6">
+                <h2 class="text-2xl font-bold text-smart-blue"><span id="detail-ward-name">Ward 1</span> Details</h2>
+                <button class="text-smart-gray hover:text-smart-red text-3xl close-modal-trigger">&times;</button>
+            </div>
+            
+            <div class="space-y-4">
+                <p><strong>Municipality:</strong> <span id="detail-municipality">Raipur Nagar Nigam</span></p>
+                <p><strong>Part of Zone:</strong> <span id="detail-zone-name">Zone X</span></p>
+                
+                <div class="grid grid-cols-2 gap-4 border-t pt-4 border-border-light dark:border-border-dark">
+                    <div>
+                        <p class="text-sm text-smart-gray dark:text-gray-400">Total Dustbins</p>
+                        <p class="text-2xl font-bold text-smart-green" id="detail-dustbins">45</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-smart-gray dark:text-gray-400">Complaints (Last 30 days)</p>
+                        <p class="text-2xl font-bold text-smart-red" id="detail-complaints">12</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-smart-gray dark:text-gray-400">Assigned Drivers</p>
+                        <p class="text-2xl font-bold text-smart-blue" id="detail-drivers">3</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <a id="detail-edit-link" href="#" class="bg-smart-yellow text-white font-medium py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors inline-block text-sm">
+                    Manage Wards in Zone
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="add-ward-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[1001] hidden">
+        <div class="modal rounded-xl p-8 transform transition-all max-w-sm">
+            <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pb-3 mb-6">
+                <h2 class="text-2xl font-bold text-smart-green">Add Ward to <span id="add-ward-zone-name"></span></h2>
+                <button class="text-smart-gray hover:text-smart-red text-3xl close-modal-trigger">&times;</button>
+            </div>
+            
+            <label for="new-ward-name" class="block text-sm font-medium text-smart-dark dark:text-text-light mb-2">New Ward Name (e.g., Ward 6)</label>
+            <input type="text" id="new-ward-name" class="w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-smart-green focus:border-transparent bg-background-light dark:bg-card-background-dark text-text-light dark:text-text-dark mb-4" placeholder="e.g., Ward 6">
+            
+            <div class="flex justify-end">
+                 <button id="confirm-add-ward-btn" class="bg-smart-green text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50" disabled>
+                    Add Ward
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="edit-wards-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[1002] hidden">
+        <div class="modal rounded-xl p-8 transform transition-all">
+            <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pb-3 mb-6">
+                <h2 class="text-2xl font-bold text-smart-yellow">Edit Wards in <span id="edit-ward-zone-name"></span></h2>
+                <button class="text-smart-gray hover:text-smart-red text-3xl close-modal-trigger">&times;</button>
+            </div>
+
+            <p class="text-sm text-smart-gray dark:text-gray-400 mb-4">Drag and drop items to change the order. (Mock)</p>
+            
+            <div id="draggable-wards-list" class="space-y-2">
+                </div>
+
+            <div class="mt-6 flex justify-end space-x-4">
+                <button class="bg-gray-300 text-smart-dark font-medium py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors close-modal-trigger">Cancel</button>
+                <button id="save-wards-btn" class="bg-smart-green text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="map-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-[1003] hidden">
+        <div class="modal rounded-xl p-8 transform transition-all max-w-2xl w-11/12 h-3/4">
+            <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pb-3 mb-6">
+                <h2 class="text-2xl font-bold text-smart-blue">Map View: <span id="map-zone-name"></span></h2>
+                <button class="text-smart-gray hover:text-smart-red text-3xl close-modal-trigger">&times;</button>
+            </div>
+            <div class="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-smart-gray">
+                
+                <p class="p-4 text-center">Live Map interface for **<span id="map-zone-name-display" class="font-bold"></span>** would load here.</p>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    // --- Mock Data ---
+    const MOCK_WARD_DATA = [
+        { id: 1, name: 'Ward 1', dustbins: 45, complaints: 12, drivers: 3, municipality: 'Raipur Nagar Nigam' },
+        { id: 2, name: 'Ward 2', dustbins: 60, complaints: 5, drivers: 4, municipality: 'Raipur Nagar Nigam' },
+        { id: 3, name: 'Ward 3', dustbins: 30, complaints: 21, drivers: 2, municipality: 'Raipur Nagar Nigam' },
+        { id: 4, name: 'Ward 4', dustbins: 55, complaints: 8, drivers: 3, municipality: 'Raipur Nagar Nigam' },
+        { id: 5, name: 'Ward 5', dustbins: 20, complaints: 15, drivers: 1, municipality: 'Raipur Nagar Nigam' },
+    ];
+    
+    // --- Global DOM Elements ---
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    const body = document.body;
+    const wardDetailModal = document.getElementById('ward-detail-modal');
+    const addWardModal = document.getElementById('add-ward-modal');
+    const editWardsModal = document.getElementById('edit-wards-modal');
+    const mapModal = document.getElementById('map-modal');
+    const zoneDisplay = document.getElementById('zone-display');
+    const addWardBtn = document.getElementById('add-ward-btn');
+    const editWardsTrigger = document.getElementById('edit-wards-trigger');
+    const newWardNameInput = document.getElementById('new-ward-name');
+    const confirmAddWardBtn = document.getElementById('confirm-add-ward-btn');
+    const saveWardsBtn = document.getElementById('save-wards-btn');
+    const wardListContainer = document.getElementById('ward-list-container');
+    const draggableWardsList = document.getElementById('draggable-wards-list');
+    
+    let currentZoneName = 'Zone X'; // Default placeholder, updated on DOMContentLoaded
+    let wardsData = [...MOCK_WARD_DATA]; // Use a mutable copy of mock data
+
+    // --- Sidebar/Modal Utilities ---
+
+    const toggleSidebar = () => {
+        if (window.innerWidth < 1024) {
+            const isOpen = sidebar.classList.toggle('-translate-x-full');
+            sidebarBackdrop.classList.toggle('hidden', isOpen);
+            body.classList.toggle('overflow-hidden', !isOpen);
+        }
+    };
+
+    const setupSidebar = () => {
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        const zonesLink = document.querySelector('a[href="zones.html"]');
+        if (zonesLink) {
+            zonesLink.classList.add('active');
+        }
+    };
+    
+    function closeAllModals() {
+        wardDetailModal.classList.add('hidden');
+        addWardModal.classList.add('hidden');
+        editWardsModal.classList.add('hidden');
+        mapModal.classList.add('hidden');
+        body.style.overflow = '';
+    }
+
+    // --- Ward Rendering and Drag/Drop Logic ---
+
+    function renderWardList(zones) {
+        wardListContainer.innerHTML = '';
+        zones.forEach(ward => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'card p-4 zone-card-wrapper ward-card-trigger';
+            wrapper.setAttribute('data-ward', ward.name);
+            wrapper.setAttribute('data-dustbins', ward.dustbins);
+            wrapper.setAttribute('data-complaints', ward.complaints);
+            wrapper.setAttribute('data-drivers', ward.drivers);
+            wrapper.setAttribute('data-municipality', ward.municipality);
+
+            wrapper.innerHTML = `
+                <div class="ward-item flex justify-between items-center">
+                    <span class="ward-item-content text-xl font-medium">${ward.name}</span>
+                    <span class="text-smart-gray text-sm">Tap for Details &rarr;</span>
+                </div>
+            `;
+            wardListContainer.appendChild(wrapper);
+        });
+        attachCardClickHandlers();
+    }
+    
+    function attachCardClickHandlers() {
+        document.querySelectorAll('.ward-card-trigger').forEach(card => {
+            card.addEventListener('click', function() {
+                openWardDetailModal(
+                    this.getAttribute('data-ward'),
+                    this.getAttribute('data-dustbins'),
+                    this.getAttribute('data-complaints'),
+                    this.getAttribute('data-drivers'),
+                    this.getAttribute('data-municipality'),
+                    currentZoneName
+                );
+            });
+        });
+    }
+
+    function renderDraggableWards(zones) {
+        draggableWardsList.innerHTML = '';
+        zones.forEach((ward, index) => {
+            const div = document.createElement('div');
+            div.className = 'draggable-zone';
+            div.draggable = true;
+            div.setAttribute('data-id', ward.id);
+            
+            div.innerHTML = `
+                <div class="flex items-center space-x-3 w-3/4">
+                    <span class="handle text-smart-gray cursor-grab">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </span>
+                    <input type="text" class="ward-name-input bg-transparent border-none focus:ring-0 text-lg font-medium w-full" 
+                           value="${ward.name}" data-id="${ward.id}">
+                </div>
+                <button class="remove-ward-btn text-smart-red hover:text-red-700 p-1" data-id="${ward.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            `;
+            draggableWardsList.appendChild(div);
+        });
+
+        setupDragAndDrop();
+        
+        // Remove ward functionality
+        draggableWardsList.querySelectorAll('.remove-ward-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.draggable-zone').remove();
+            });
+        });
+    }
+
+    function setupDragAndDrop() {
+        // Mock drag and drop logic (visual swap only)
+        let dragSrcEl = null;
+
+        draggableWardsList.addEventListener('dragstart', (e) => {
+            dragSrcEl = e.target.closest('.draggable-zone');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', dragSrcEl.innerHTML);
+            setTimeout(() => dragSrcEl.classList.add('opacity-40'), 0);
+        });
+
+        draggableWardsList.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        });
+
+        draggableWardsList.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const dropTarget = e.target.closest('.draggable-zone');
+            if (dragSrcEl != dropTarget && dropTarget) {
+                const tempHTML = dragSrcEl.innerHTML;
+                dragSrcEl.innerHTML = dropTarget.innerHTML;
+                dropTarget.innerHTML = tempHTML;
+            }
+            dropTarget?.classList.remove('bg-smart-blue-light');
+            dragSrcEl.classList.remove('opacity-40');
+            return false;
+        });
+
+        draggableWardsList.addEventListener('dragend', () => {
+            draggableWardsList.querySelectorAll('.draggable-zone').forEach(zone => {
+                zone.classList.remove('opacity-40', 'bg-smart-blue-light');
+            });
+        });
+    }
+    
+    // --- Ward Detail Modal ---
+
+    function openWardDetailModal(wardName, dustbins, complaints, drivers, municipality, zoneName) {
+        document.getElementById('detail-ward-name').textContent = wardName;
+        document.getElementById('detail-municipality').textContent = municipality;
+        document.getElementById('detail-zone-name').textContent = zoneName;
+        document.getElementById('detail-dustbins').textContent = dustbins;
+        document.getElementById('detail-complaints').textContent = complaints;
+        document.getElementById('detail-drivers').textContent = drivers;
+        
+        // Setup link to go back to the Zones page
+        const editLink = document.getElementById('detail-edit-link');
+        editLink.href = `zones.html`; // Redirects to zones page for simplicity
+        
+        wardDetailModal.classList.remove('hidden');
+        body.style.overflow = 'hidden';
+    }
+
+
+    // --- Main Logic on DOM Load ---
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        setupSidebar();
+        
+        // 1. Get Zone Name from URL and display it
+        const urlParams = new URLSearchParams(window.location.search);
+        currentZoneName = urlParams.get('zone') || 'Zone X'; 
+        zoneDisplay.textContent = decodeURIComponent(currentZoneName);
+        
+        // Initial render
+        renderWardList(wardsData);
+
+
+        // --- Event Listeners for Actions ---
+
+        // 1. Add Ward Button
+        addWardBtn.addEventListener('click', () => {
+            document.getElementById('add-ward-zone-name').textContent = currentZoneName;
+            newWardNameInput.value = `Ward ${wardsData.length + 1}`;
+            confirmAddWardBtn.disabled = false;
+            addWardModal.classList.remove('hidden');
+            body.style.overflow = 'hidden';
+            newWardNameInput.focus();
+        });
+        
+        newWardNameInput.addEventListener('input', function() {
+            confirmAddWardBtn.disabled = this.value.trim().length === 0;
+        });
+
+        confirmAddWardBtn.addEventListener('click', () => {
+            const name = newWardNameInput.value.trim();
+            if (name) {
+                const newId = Math.max(...wardsData.map(w => w.id)) + 1;
+                wardsData.push({ 
+                    id: newId, 
+                    name: name,
+                    dustbins: 0,
+                    complaints: 0,
+                    drivers: 0,
+                    municipality: 'Raipur Nagar Nigam'
+                });
+                renderWardList(wardsData); // Re-render main list
+            }
+            closeAllModals();
+        });
+
+        // 2. Edit Wards Button (Trigger Modal)
+        editWardsTrigger.addEventListener('click', () => {
+            document.getElementById('edit-ward-zone-name').textContent = currentZoneName;
+            renderDraggableWards(wardsData);
+            editWardsModal.classList.remove('hidden');
+            body.style.overflow = 'hidden';
+        });
+
+        // 3. Save Wards Button (Persist Order/Name)
+        saveWardsBtn.addEventListener('click', () => {
+            const updatedWardsOrder = [];
+            const wardElements = draggableWardsList.querySelectorAll('.draggable-zone');
+
+            // Collect data from the current order in the modal
+            wardElements.forEach(zoneElement => {
+                const id = parseInt(zoneElement.getAttribute('data-id'));
+                const newName = zoneElement.querySelector('.ward-name-input').value.trim();
+                
+                // Find original ward data and update the name
+                const originalWard = wardsData.find(w => w.id === id);
+                if (originalWard) {
+                    updatedWardsOrder.push({ ...originalWard, name: newName || `Ward ${id}` });
+                }
+            });
+
+            // Update the global state with the new order/names and re-render
+            wardsData = updatedWardsOrder;
+            renderWardList(wardsData); 
+            
+            console.log("--- SAVED WARD ORDER/NAMES (MOCK) ---");
+            console.log(wardsData);
+
+            closeAllModals();
+        });
+
+        // 4. View Map Button (Trigger Modal)
+        document.querySelector('a[href="admin_map_operations.html"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('map-zone-name-display').textContent = currentZoneName;
+            document.getElementById('map-zone-name').textContent = currentZoneName;
+            mapModal.classList.remove('hidden');
+            body.style.overflow = 'hidden';
+        });
+        
+
+        // --- Setup Modal Close Triggers ---
+        document.querySelectorAll('.close-modal-trigger').forEach(btn => {
+            btn.addEventListener('click', closeAllModals);
+        });
+
+        [wardDetailModal, addWardModal, editWardsModal, mapModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeAllModals();
+            });
+        });
+    });
+</script>
+<script src="../assets/js/darkmode.js"></script>
+</body>
+
+</html>
